@@ -13,8 +13,73 @@
 	<ui:define name="menu"></ui:define>
 	<ui:define name="title_page">Configuration de la Drivebox</ui:define>
 	<ui:define name="content">
-		<p>blabla</p>
+		<script type="text/javascript">
+			function handleDrop(event, ui) {
+				ui.draggable.fadeOut(function() {
+					jQuery(this).fadeIn();
+				});
+				jQuery(this).droppable('disable');
+				alert(jQuery(this));
+				
+			}
+			function handleDrop2(event, ui) {
+				var obj = jQuery(this);
+				alert(obj.position);
+				var curleft = 0;
+			      var curtop = 0;
+			      if (obj.offsetParent) {
+			            alert(obj.offsetLeft);
+			                  curleft += obj.offsetLeft;
+			                  curtop += obj.offsetTop;
+			           
+			      }
+			      alert(curleft+""+curtop);
+			}
+		</script>
+		<h:form prependId="false">
+			<h:panelGrid>
+				<h:panelGroup>
+					<h:panelGrid columns="1" style="margin-left:40px;">
+						<p:outputPanel id="RF"
+							style="background: #333333; width: 400px; height: 200px; display: block;">
+							<p:droppable dropListener="#{configDriveboxController.onDrop}" 
+								tolerance="fit" activeStyleClass="slotActive"
+								onDropUpdate="selectedApps growl"
+								datasource="availableApps" scope="test"  onDrop="handleDrop2"/>
+						</p:outputPanel>
+					</h:panelGrid>
+				</h:panelGroup>
+
+
+
+				<p:panel header="Squad">
+					<p:dataGrid id="availableApps"
+						value="#{configDriveboxController.lApp}" var="app" columns="4">
+						<p:column>
+							<p:graphicImage id="application"
+								value="/resources/images/apps/#{app.icone}"
+								styleClass="appImage"/>
+
+							<p:draggable for="application" revert="true" stack=".appImage"
+								scope="test"/>
+							
+						</p:column>
+					</p:dataGrid>
+					<p:droppable dropListener="#{configDriveboxController.onDropBack}"
+								tolerance="fit" activeStyleClass="slotActive"
+								onDropUpdate="selectedApps growl"
+								datasource="availableApps" scope="test"/>
+				</p:panel>
+
+
+			</h:panelGrid>
+		</h:form>
+
+		<p:panel header="Squad">
+			<p:dataList value="#{configDriveboxController.selectedApps}"
+				var="app" id="selectedApps">  
+            #{app.name} - #{app.name}  
+        </p:dataList>
+		</p:panel>
 	</ui:define>
-
-
 </ui:composition>

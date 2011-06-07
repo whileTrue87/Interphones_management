@@ -13,20 +13,20 @@ import ch.suricatesolutions.dingdong.business.MenuItem;
 
 @ManagedBean
 public class MenuController {
+	private static final String ADMINISTRATORS="administrators";
+	private static final String USERS="users";
 
 	private List<MenuItem> links = new ArrayList<MenuItem>();
 	
 	public MenuController(){
-//		FacesContext context = FacesContext.getCurrentInstance();
-//		Principal p = context.getExternalContext().getUserPrincipal();
-//		String cl = "type ="+;
 		ArrayList<String> admins = new ArrayList<String>();
-		admins.add("administrators");
+		admins.add(ADMINISTRATORS);
 		ArrayList<String> users = new ArrayList<String>();
-		users.add("users");
+		users.add(USERS);
 		ArrayList<String> all = new ArrayList<String>();
-		all.add("administrators");
-		all.add("users");
+		all.add(ADMINISTRATORS);
+		all.add(USERS);
+		
 		links.add(new MenuItem("Accueil", "/pages/home.xhtml", all));
 		links.add(new MenuItem("Configuration Drivebox", "/pages/user/driveboxConfig.xhtml", users));
 	}
@@ -45,17 +45,7 @@ public class MenuController {
 	
 	public boolean accepts(MenuItem mi){
 		HttpServletRequest request =  ((HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest());
-//		return true;
-//		return FacesContext.getCurrentInstance().getExternalContext().isUserInRole("administrators");
-//		Principal p = context.getExternalContext().getUserPrincipal();
-		
-//		RoleServiceUtil r;
-//		String cl = "type ="+p.getClass();
-//		links.get(0).setName(cl);
-//		if(p instanceof GenericPrincipal){
-//			
-//		}
-		return mi.accepts(request);//context.getExternalContext().isUserInRole("administrator");//mi.accepts(context.getExternalContext());
+		return mi.accepts(request);
 	}
 	
 }
