@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>[DingDong] <ui:insert name="title"></ui:insert>
+	</title>
+	<h:outputStylesheet library="css" name="style.css" />
+</h:head>
+<h:body>
+	<div id="art-page-background-simple-gradient">
+		<div id="art-page-background-gradient"></div>
+	</div>
+	<div id="art-main">
+		<div class="art-sheet">
+			<div class="art-sheet-tl"></div>
+			<div class="art-sheet-tr"></div>
+			<div class="art-sheet-bl"></div>
+			<div class="art-sheet-br"></div>
+			<div class="art-sheet-tc"></div>
+			<div class="art-sheet-bc"></div>
+			<div class="art-sheet-cl"></div>
+			<div class="art-sheet-cr"></div>
+			<div class="art-sheet-cc"></div>
+			<div class="art-sheet-body">
+				<div class="art-header">
+					<div class="art-header-png"></div>
+					<div class="art-header-jpeg"></div>
+					<div class="art-logo">
+						<h1 id="name-text" class="art-logo-name">
+							<a href="#">Ding!Dong!</a>
+						</h1>
+						<div id="slogan-text" class="art-logo-text">Configuration de
+							la Drivebox</div>
+					</div>
+				</div>
+				<div class="art-content-layout">
+					<div class="art-content-layout-row">
+						<div class="art-layout-cell art-content">
+							<div class="art-post">
+								<div class="art-post-body">
+									<div class="art-post-inner art-article">
+										<h2>
+											<ui:insert name="title_page"></ui:insert>
+										</h2>
+									</div>
+									<div class="art-postcontent">
+										<ui:insert name="content"></ui:insert>
+									</div>
+									<div class="cleared"></div>
+								</div>
+								<div class="cleared"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="cleared"></div>
+			<div class="art-footer">
+				<div class="art-footer-t"></div>
+				<div class="art-footer-l"></div>
+				<div class="art-footer-b"></div>
+				<div class="art-footer-r"></div>
+				<div class="art-footer-body">
+					<div class="art-footer-text">
+
+						<p>Copyright &#169; 2011 ---. All Rights Reserved.</p>
+					</div>
+					<div class="cleared"></div>
+				</div>
+			</div>
+			<div class="cleared"></div>
+		</div>
+	</div>
+	<div class="cleared"></div>
+</h:body>
+
+</html>

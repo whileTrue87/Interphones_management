@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="/templates/base_nomenu.xhtml">
+
+	<ui:define name="title">Login</ui:define>
+	<ui:define name="menu"></ui:define>
+	<ui:define name="title_page">Se connecter</ui:define>
+	<ui:define name="content">
+		<form method="post" action="j_security_check">
+			<table style="border-width: 0px;">
+				<tr style="border-width: 0px;">
+					<td style="border-width: 0px;">Login</td>
+					<td style="border-width: 0px;"><input type="text"
+						name="j_username" />
+					</td>
+				</tr>
+				<tr style="border-width: 0px;">
+					<td style="border-width: 0px;">Mot de passe</td>
+					<td style="border-width: 0px;"><input type="text"
+						name="j_password" />
+					</td>
+				</tr>
+			</table>
+			<p align="right">
+				<input type="submit" value="Connexion" />
+			</p>
+		</form>
+	</ui:define>
+
+
+</ui:composition>
+
+
+
+
