@@ -13,17 +13,35 @@ import java.util.List;
 @Table(name="t_sipphone")
 public class TSipphone implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private int pkSipphone;
-	private String idSipphone;
-	private List<TDrivebox> TDriveboxs;
-
-    public TSipphone() {
-    }
-
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	@Column(name="pk_sipphone")
+	private int pkSipphone;
+
+	@Column(name="id_sipphone")
+	private String idSipphone;
+
+	//bi-directional many-to-many association to TDrivebox
+	@ManyToMany(mappedBy="TSipphones1")
+	private List<TDrivebox> TDriveboxs1;
+
+	//bi-directional many-to-many association to TDrivebox
+    @ManyToMany
+	@JoinTable(
+		name="t_drivebox_has_sipphone"
+		, joinColumns={
+			@JoinColumn(name="pfk_sipphone")
+			}
+		, inverseJoinColumns={
+			@JoinColumn(name="pfk_drivebox")
+			}
+		)
+	private List<TDrivebox> TDriveboxs2;
+
+    public TSipphone() {
+    }
+
 	public int getPkSipphone() {
 		return this.pkSipphone;
 	}
@@ -32,8 +50,6 @@ public class TSipphone implements Serializable {
 		this.pkSipphone = pkSipphone;
 	}
 
-
-	@Column(name="id_sipphone")
 	public String getIdSipphone() {
 		return this.idSipphone;
 	}
@@ -42,15 +58,20 @@ public class TSipphone implements Serializable {
 		this.idSipphone = idSipphone;
 	}
 
-
-	//bi-directional many-to-many association to TDrivebox
-	@ManyToMany(mappedBy="TSipphones")
-	public List<TDrivebox> getTDriveboxs() {
-		return this.TDriveboxs;
+	public List<TDrivebox> getTDriveboxs1() {
+		return this.TDriveboxs1;
 	}
 
-	public void setTDriveboxs(List<TDrivebox> TDriveboxs) {
-		this.TDriveboxs = TDriveboxs;
+	public void setTDriveboxs1(List<TDrivebox> TDriveboxs1) {
+		this.TDriveboxs1 = TDriveboxs1;
+	}
+	
+	public List<TDrivebox> getTDriveboxs2() {
+		return this.TDriveboxs2;
+	}
+
+	public void setTDriveboxs2(List<TDrivebox> TDriveboxs2) {
+		this.TDriveboxs2 = TDriveboxs2;
 	}
 	
 }

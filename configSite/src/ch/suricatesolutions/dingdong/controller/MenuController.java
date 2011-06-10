@@ -28,7 +28,7 @@ public class MenuController {
 		all.add(USERS);
 		
 		links.add(new MenuItem("Accueil", "/pages/home.xhtml", all));
-		links.add(new MenuItem("Configuration Drivebox", "/pages/user/driveboxConfig.xhtml", users));
+		links.add(new MenuItem("Configuration Drivebox", "/pages/user/listDrivebox.xhtml", users));
 	}
 
 	public List<MenuItem> getLinks() {

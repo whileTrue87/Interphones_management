@@ -13,21 +13,29 @@ import java.util.List;
 @Table(name="t_client")
 public class TClient implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="pk_client")
 	private int pkClient;
+
 	private String login;
+
 	private String nom;
+
 	private int npa;
+
 	private String password;
+
 	private String prenom;
+
+	//bi-directional many-to-one association to TDrivebox
+	@OneToMany(mappedBy="TClient")
 	private List<TDrivebox> TDriveboxs;
 
     public TClient() {
     }
 
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="pk_client")
 	public int getPkClient() {
 		return this.pkClient;
 	}
@@ -35,7 +43,6 @@ public class TClient implements Serializable {
 	public void setPkClient(int pkClient) {
 		this.pkClient = pkClient;
 	}
-
 
 	public String getLogin() {
 		return this.login;
@@ -45,7 +52,6 @@ public class TClient implements Serializable {
 		this.login = login;
 	}
 
-
 	public String getNom() {
 		return this.nom;
 	}
@@ -53,7 +59,6 @@ public class TClient implements Serializable {
 	public void setNom(String nom) {
 		this.nom = nom;
 	}
-
 
 	public int getNpa() {
 		return this.npa;
@@ -63,7 +68,6 @@ public class TClient implements Serializable {
 		this.npa = npa;
 	}
 
-
 	public String getPassword() {
 		return this.password;
 	}
@@ -71,7 +75,6 @@ public class TClient implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 
 	public String getPrenom() {
 		return this.prenom;
@@ -81,9 +84,6 @@ public class TClient implements Serializable {
 		this.prenom = prenom;
 	}
 
-
-	//bi-directional many-to-one association to TDrivebox
-	@OneToMany(mappedBy="TClient")
 	public List<TDrivebox> getTDriveboxs() {
 		return this.TDriveboxs;
 	}

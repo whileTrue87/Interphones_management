@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="/templates/base.xhtml">
+
+	<ui:define name="title">Liste de vos Driveboxes</ui:define>
+	<ui:define name="menu"></ui:define>
+	<ui:define name="title_page">Liste de vos Driveboxes</ui:define>
+	<ui:define name="content">
+		<h:form prependId="false">
+			<p:dataTable var="drivebox" value="#{configDriveboxController.driveboxList}"
+					id="allDriveboxes"
+					emptyMessage="Vous n'avez actuellement aucune Drivebox">
+					
+					<!-- Contract's name -->
+					<p:column filterBy="#{drivebox.idDrivebox}"
+						headerText="ID" filterMatchMode="contains"
+						filterStyle="width: 5em" style="width: 20%">
+						<h:outputText value="#{drivebox.idDrivebox}" />
+					</p:column>
+					<p:column filterBy="#{drivebox.name}"
+						headerText="Nom" filterMatchMode="contains"
+						filterStyle="width: 5em">
+						<h:outputText value="#{drivebox.name}" />
+					</p:column>
+					<p:column filterBy="#{drivebox.mute}"
+						headerText="Muet" filterMatchMode="exact"
+						filterStyle="width: 5em" style="width: 20%"
+						filterOptions="#{configDriveboxController.booleanOptions}">
+						<h:outputText value="#{drivebox.mute}" />
+					</p:column>
+					<p:column headerText="Modification" style="width: 15%; text-align:center">
+						<p:commandButton title="Modifier la Drivebox"
+							action="#{configDriveboxController.editDrivebox}" image="ui-icon-pencil" ajax="false">
+							<f:param name="id" value="#{drivebox.pkDrivebox}" />
+						</p:commandButton>
+					</p:column>
+			</p:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>

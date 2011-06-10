@@ -10,19 +10,26 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="t_transfert_number")
+@NamedQueries({ @NamedQuery(name = "TTransfertNumber.getNumberForDrivebox", query = "SELECT t FROM TTransfertNumber t WHERE t.TDrivebox.pkDrivebox=:pkDrivebox")
+})
 public class TTransfertNumber implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="pk_transfert_number")
 	private int pkTransfertNumber;
+
 	private String number;
+
+	//bi-directional many-to-one association to TDrivebox
+    @ManyToOne
+	@JoinColumn(name="fk_drivebox")
 	private TDrivebox TDrivebox;
 
     public TTransfertNumber() {
     }
 
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="pk_transfert_number")
 	public int getPkTransfertNumber() {
 		return this.pkTransfertNumber;
 	}
@@ -30,7 +37,6 @@ public class TTransfertNumber implements Serializable {
 	public void setPkTransfertNumber(int pkTransfertNumber) {
 		this.pkTransfertNumber = pkTransfertNumber;
 	}
-
 
 	public String getNumber() {
 		return this.number;
@@ -40,10 +46,6 @@ public class TTransfertNumber implements Serializable {
 		this.number = number;
 	}
 
-
-	//bi-directional many-to-one association to TDrivebox
-    @ManyToOne
-	@JoinColumn(name="fk_drivebox")
 	public TDrivebox getTDrivebox() {
 		return this.TDrivebox;
 	}

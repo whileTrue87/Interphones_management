@@ -11,21 +11,21 @@ import javax.persistence.*;
 public class TDriveboxHasApplicationPK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
+
+	@Column(name="pfk_drivebox", insertable=false, updatable=false)
 	private int pfkDrivebox;
+
+	@Column(name="pfk_application", insertable=false, updatable=false)
 	private int pfkApplication;
 
     public TDriveboxHasApplicationPK() {
     }
-
-	@Column(name="pfk_drivebox")
 	public int getPfkDrivebox() {
 		return this.pfkDrivebox;
 	}
 	public void setPfkDrivebox(int pfkDrivebox) {
 		this.pfkDrivebox = pfkDrivebox;
 	}
-
-	@Column(name="pfk_application")
 	public int getPfkApplication() {
 		return this.pfkApplication;
 	}

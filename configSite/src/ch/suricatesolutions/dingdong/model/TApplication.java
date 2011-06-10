@@ -11,24 +11,43 @@ import java.util.List;
  */
 @Entity
 @Table(name="t_application")
-public class TApplication implements Serializable {
+@NamedQueries({ @NamedQuery(name = "TApplication.allApps", query = "SELECT a FROM TApplication a"),
+	@NamedQuery(name = "TApplication.selectedAppsFromId", query = "SELECT a FROM TApplication a JOIN a.TDriveboxHasApplications d WHERE d.id.pfkDrivebox=:id"),
+})
+	
+	public class TApplication implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name="pk_application")
 	private int pkApplication;
+
+	@Column(name="configuration_link")
 	private String configurationLink;
+
+    @Lob()
+	@Column(name="configuration_schema")
 	private byte[] configurationSchema;
+
+    @Lob()
+	@Column(name="drivebox_application")
 	private byte[] driveboxApplication;
-	private byte[] icone;
+
+	private String icone;
+
 	private String id;
+	private String name;
+
 	private String version;
+
+	//bi-directional many-to-one association to TDriveboxHasApplication
+	@OneToMany(mappedBy="TApplication")
 	private List<TDriveboxHasApplication> TDriveboxHasApplications;
 
     public TApplication() {
     }
 
-
-	@Id
-	@GeneratedValue(strategy=GenerationType.AUTO)
-	@Column(name="pk_application")
 	public int getPkApplication() {
 		return this.pkApplication;
 	}
@@ -37,8 +56,6 @@ public class TApplication implements Serializable {
 		this.pkApplication = pkApplication;
 	}
 
-
-	@Column(name="configuration_link")
 	public String getConfigurationLink() {
 		return this.configurationLink;
 	}
@@ -47,9 +64,6 @@ public class TApplication implements Serializable {
 		this.configurationLink = configurationLink;
 	}
 
-
-    @Lob()
-	@Column(name="configuration_schema")
 	public byte[] getConfigurationSchema() {
 		return this.configurationSchema;
 	}
@@ -58,9 +72,6 @@ public class TApplication implements Serializable {
 		this.configurationSchema = configurationSchema;
 	}
 
-
-    @Lob()
-	@Column(name="drivebox_application")
 	public byte[] getDriveboxApplication() {
 		return this.driveboxApplication;
 	}
@@ -69,16 +80,13 @@ public class TApplication implements Serializable {
 		this.driveboxApplication = driveboxApplication;
 	}
 
-
-    @Lob()
-	public byte[] getIcone() {
+	public String getIcone() {
 		return this.icone;
 	}
 
-	public void setIcone(byte[] icone) {
+	public void setIcone(String icone) {
 		this.icone = icone;
 	}
-
 
 	public String getId() {
 		return this.id;
@@ -88,7 +96,6 @@ public class TApplication implements Serializable {
 		this.id = id;
 	}
 
-
 	public String getVersion() {
 		return this.version;
 	}
@@ -97,15 +104,20 @@ public class TApplication implements Serializable {
 		this.version = version;
 	}
 
-
-	//bi-directional many-to-one association to TDriveboxHasApplication
-	@OneToMany(mappedBy="TApplication")
 	public List<TDriveboxHasApplication> getTDriveboxHasApplications() {
 		return this.TDriveboxHasApplications;
 	}
 
 	public void setTDriveboxHasApplications(List<TDriveboxHasApplication> TDriveboxHasApplications) {
 		this.TDriveboxHasApplications = TDriveboxHasApplications;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 	
 }

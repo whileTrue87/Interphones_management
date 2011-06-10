@@ -10,18 +10,35 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="t_drivebox_has_application")
+@NamedQueries({ 
+	@NamedQuery(name = "TDriveboxHasApplication.installedAppsFromPkDrivebox", query = "SELECT a FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pk and a.enabled=true"),
+	@NamedQuery(name = "TDriveboxHasApplication.appFromPks", query = "SELECT a FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication"),
+	@NamedQuery(name = "TDriveboxHasApplication.countAppFromPks", query = "SELECT count(a) FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication")})
 public class TDriveboxHasApplication implements Serializable {
 	private static final long serialVersionUID = 1L;
+
+	@EmbeddedId
 	private TDriveboxHasApplicationPK id;
+
+    @Lob()
+	@Column(name="configuration_xml")
 	private byte[] configurationXml;
-	private TDrivebox TDrivebox;
+
+	//bi-directional many-to-one association to TApplication
+    @ManyToOne
+	@JoinColumn(name="pfk_application")
 	private TApplication TApplication;
+
+	//bi-directional many-to-one association to TDrivebox
+    @ManyToOne
+	@JoinColumn(name="pfk_drivebox")
+	private TDrivebox TDrivebox;
+    
+    private boolean enabled;
 
     public TDriveboxHasApplication() {
     }
 
-
-	@EmbeddedId
 	public TDriveboxHasApplicationPK getId() {
 		return this.id;
 	}
@@ -30,9 +47,6 @@ public class TDriveboxHasApplication implements Serializable {
 		this.id = id;
 	}
 	
-
-    @Lob()
-	@Column(name="configuration_xml")
 	public byte[] getConfigurationXml() {
 		return this.configurationXml;
 	}
@@ -41,10 +55,14 @@ public class TDriveboxHasApplication implements Serializable {
 		this.configurationXml = configurationXml;
 	}
 
+	public TApplication getTApplication() {
+		return this.TApplication;
+	}
 
-	//bi-directional many-to-one association to TDrivebox
-    @ManyToOne
-	@JoinColumn(name="pfk_drivebox")
+	public void setTApplication(TApplication TApplication) {
+		this.TApplication = TApplication;
+	}
+	
 	public TDrivebox getTDrivebox() {
 		return this.TDrivebox;
 	}
@@ -52,17 +70,13 @@ public class TDriveboxHasApplication implements Serializable {
 	public void setTDrivebox(TDrivebox TDrivebox) {
 		this.TDrivebox = TDrivebox;
 	}
-	
 
-	//bi-directional many-to-one association to TApplication
-    @ManyToOne
-	@JoinColumn(name="pfk_application")
-	public TApplication getTApplication() {
-		return this.TApplication;
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
-	public void setTApplication(TApplication TApplication) {
-		this.TApplication = TApplication;
+	public boolean isEnabled() {
+		return enabled;
 	}
 	
 }
