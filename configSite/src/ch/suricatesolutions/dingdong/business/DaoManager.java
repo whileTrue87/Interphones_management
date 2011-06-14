@@ -15,27 +15,51 @@ import ch.suricatesolutions.dingdong.model.TTransfertNumber;
 
 @EJB
 @Stateless
+/**
+ * EJB responsible for the database operations
+ * @author Maxime Reymond
+ */
 public class DaoManager {
 
 	@PersistenceContext(unitName = "DingDong")
 	private EntityManager em;
 
+	/**
+	 * Get all the driveboxes of the user identified by his login
+	 * @param login The login of the user
+	 * @return A List containing all the driveboxes for the given user
+	 */
 	public List<TDrivebox> getDriveboxByLogin(String login) {
 		em.flush();
 		return em.createNamedQuery("TDrivebox.driveboxFromUser", TDrivebox.class).setParameter("login", login).getResultList();
 	}
 
+	/**
+	 * Get all the applications of the database
+	 * @return A List containing all the applications of the database
+	 */
 	public List<TApplication> getAllApps() {
 		em.flush();
 		return em.createNamedQuery("TApplication.allApps", TApplication.class).getResultList();
 	}
 
-	public List<TDriveboxHasApplication> getInstalledAppsFromPkDrivebox(int pdDrivebox) {
+	/**
+	 * Get all the applications already installed on the given drivebox
+	 * @param pkDrivebox The primary key of the driveboy
+	 * @return A List containing all the installed applications of the given drivebox
+	 */
+	public List<TDriveboxHasApplication> getInstalledAppsFromPkDrivebox(int pkDrivebox) {
 		em.flush();
 		return em.createNamedQuery("TDriveboxHasApplication.installedAppsFromPkDrivebox", TDriveboxHasApplication.class)
-				.setParameter("pk", pdDrivebox).getResultList();
+				.setParameter("pk", pkDrivebox).getResultList();
 	}
 
+	/**
+	 * Update the configuration file of the installed application identified by the 2 primary keys parameters
+	 * @param pkApplication The primary key of the application
+	 * @param pkDrivebox The primary key of the drivebox
+	 * @param configFile The configuration file to update
+	 */
 	public void updateInstalledApp(int pkApplication, int pkDrivebox, byte[] configFile) {
 		em.flush();
 		TDriveboxHasApplication t = getInstalledAppFromPks(pkApplication, pkDrivebox);
@@ -53,6 +77,12 @@ public class DaoManager {
 		// pkDrivebox);
 	}
 
+	/**
+	 * Get all the installed applications identified by the 2 primary keys parameters
+	 * @param pkApplication The primary key of the application
+	 * @param pkDrivebox The primary key of the driveby
+	 * @return A TDriveBoxHasApplication identified by the given parameters
+	 */
 	public TDriveboxHasApplication getInstalledAppFromPks(int pkApplication, int pkDrivebox) {
 		// System.out.printf("get installed app:%d of drivebox:%d\n",
 		// pkApplication, pkDrivebox);
@@ -66,11 +96,21 @@ public class DaoManager {
 			return null;
 	}
 
+	/**
+	 * Get the primary key of a drivebox from his id
+	 * @param id The id of the drivebox
+	 * @return The primary key of the drivebox identified by the given id
+	 */
 	public int getDriveboxPkFromId(String id) {
 		em.flush();
 		return em.createNamedQuery("TApplication.pkFromId", Integer.class).setParameter(":id", id).getSingleResult();
 	}
 
+	/**
+	 * Disable an installed application identified by the 2 primary keys parameters
+	 * @param pkApplication The primary key of the application
+	 * @param pkDrivebox The primary key of the drivebox
+	 */
 	public void disableAppFromDrivebox(int pkApplication, int pkDrivebox) {
 		em.flush();
 		TDriveboxHasApplication dHA = getInstalledAppFromPks(pkApplication, pkDrivebox);
@@ -80,6 +120,13 @@ public class DaoManager {
 		}
 	}
 
+	/**
+	 * Update a drivebox with the given parameters
+	 * @param pkDrivebox The primary key of the driveboy
+	 * @param name The new name of the drivebox
+	 * @param telNum The new transfert phone number of the drivebox
+	 * @param mute The new state of the mute mode
+	 */
 	public void updateDrivebox(int pkDrivebox, String name, String telNum, boolean mute) {
 		em.flush();
 		TDrivebox d = em.createNamedQuery("TDrivebox.getDriveboxFromPk", TDrivebox.class).setParameter("pkDrivebox", pkDrivebox).getSingleResult();

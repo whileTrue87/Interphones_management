@@ -13,29 +13,6 @@
 	<ui:define name="menu"></ui:define>
 	<ui:define name="title_page">Configuration de la Drivebox</ui:define>
 	<ui:define name="content">
-		<script type="text/javascript">
-			function handleDrop(event, ui) {
-				ui.draggable.fadeOut(function() {
-					jQuery(this).fadeIn();
-				});
-				jQuery(this).droppable('disable');
-				alert(jQuery(this));
-
-			}
-			function handleDrop2(event, ui) {
-				var obj = jQuery(this);
-				//alert(obj.position);
-				var curleft = 0;
-				var curtop = 0;
-				if (obj.offsetParent) {
-					//alert(obj.offsetLeft);
-					curleft += obj.offsetLeft;
-					curtop += obj.offsetTop;
-
-				}
-				//alert(curleft + "" + curtop);
-			}
-		</script>
 		<h:form id="paramForm">
 			<table>
 				<tr>
@@ -64,10 +41,10 @@
 				<!-- <ui:repeat value="#{configDriveboxController.tab}" var="row" >
 						<ui:repeat value="#{row}" var="cell"> -->
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_0_0"
+						  id="appDrop_0_0"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(0,0)}"
@@ -80,10 +57,10 @@
 					</ui:repeat>-->
 
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_0_1"
+						  id="appDrop_0_1"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(0,1)}"
@@ -92,10 +69,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_0_2"
+						  id="appDrop_0_2"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(0,2)}"
@@ -104,10 +81,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_0_3"
+						  id="appDrop_0_3"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(0,3)}"
@@ -116,10 +93,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_0_4"
+						  id="appDrop_0_4"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(0,4)}"
@@ -128,10 +105,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_1_0"
+						  id="appDrop_1_0"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(1,0)}"
@@ -140,10 +117,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_1_1"
+						  id="appDrop_1_1"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(1,1)}"
@@ -152,10 +129,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_1_2"
+						  id="appDrop_1_2"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(1,2)}"
@@ -164,10 +141,10 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_1_3"
+						  id="appDrop_1_3"
 						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(1,3)}"
@@ -176,11 +153,11 @@
 						style="opacity: 0.2; filter:alpha(opacity=20);" />
 				</p:outputPanel>
 				<p:outputPanel
-					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222;">
+					style="background: #333333; width: 80px; height: 80px; display: block; border: 1px solid #222222; text-align:center;">
 					<p:droppable dropListener="#{configDriveboxController.onDrop}"
 						tolerance="fit" activeStyleClass="slotActive" scope="test"
-						onDrop="handleDrop2" id="appDrop_1_4"
-						onDropUpdate="installedAppsGrid msgs" datasource="availableApps" />
+						id="appDrop_1_4" onDropUpdate="installedAppsGrid msgs"
+						datasource="availableApps" />
 					<p:graphicImage
 						value="/resources/images/apps/#{configDriveboxController.installedAppIcon(1,4)}"
 						rendered="#{configDriveboxController.iconHasToBeDisplayed(1,4)}"
@@ -194,7 +171,7 @@
 				<p:dataGrid id="availableApps"
 					value="#{configDriveboxController.lApp}" var="app" columns="4">
 					<p:column>
-						<p:panel header="#{app.id}">
+						<p:panel header="#{app.name}">
 
 							<p:graphicImage id="application"
 								value="/resources/images/apps/#{app.icone}"

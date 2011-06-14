@@ -1,5 +1,6 @@
 package ch.suricatesolutions.dingdong.controller;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,10 +28,12 @@ import ch.suricatesolutions.dingdong.model.TApplication;
 import ch.suricatesolutions.dingdong.model.TDrivebox;
 import ch.suricatesolutions.dingdong.model.TDriveboxHasApplication;
 
-import com.sun.faces.taglib.html_basic.SelectBooleanCheckboxTag;
-
 @ManagedBean
 @SessionScoped
+/**
+ * Controls the display of the Drivebox configuration
+ * @author Maxime Reymond
+ */
 public class ConfigDriveboxController implements Serializable {
 
 	private int pkDrivebox;
@@ -42,14 +45,20 @@ public class ConfigDriveboxController implements Serializable {
 	@EJB
 	private XmlManager xml;
 
-	private boolean[][] installedApp = new boolean[2][5];
+	//Indicates if an application is not present before
+	//the loading of the page on the dashboard grid
+	//If a cell is false, an app is present
+	private boolean[][] notInstalledApp = new boolean[2][5];
 
-	private Map<MyPoint, List<Integer>> conflicts = new HashMap<MyPoint, List<Integer>>();
+	//Map containing the possible conflicts on the dashboard grid
+	//Each entry(Point(x,y)) represent a list of present application
+	private Map<Point, List<Integer>> conflicts = new HashMap<Point, List<Integer>>();
 
 	private SelectItem[] booleanOptions = new SelectItem[3];
 
 	private TDriveboxHasApplication app;
 
+	//Binding properties
 	private HtmlInputText nameInput;
 	private HtmlInputText numInput;
 	private HtmlSelectBooleanCheckbox muteInput;
@@ -60,32 +69,36 @@ public class ConfigDriveboxController implements Serializable {
 		booleanOptions[2] = new SelectItem(String.valueOf(false));
 	}
 
+	/**
+	 * Is called when an application is dropped
+	 * on the dashboard grid, controls the database updates
+	 * @param event The dropped application
+	 */
 	public void onDrop(DragDropEvent event) {
 		try {
 			TApplication app = (TApplication) event.getData();
 			Droppable d = (Droppable) event.getSource();
 			String id = d.getId();
-			// System.out.println("id="+id);
 			String[] tokens = id.split("_");
 			byte[] configFile = null;
 			int x = Integer.parseInt(tokens[1]);
 			int y = Integer.parseInt(tokens[2]);
 
-			Set<MyPoint> keys = conflicts.keySet();
-			for (MyPoint p : keys) {
+			Set<Point> keys = conflicts.keySet();
+			for (Point p : keys) {
 				List<Integer> lInt = conflicts.get(p);
 				lInt.remove((Object) app.getPkApplication());
 			}
 
-			List<Integer> lInt = conflicts.get(new MyPoint(x, y));
+			List<Integer> lInt = conflicts.get(new Point(x, y));
 			if (lInt == null) {
 				lInt = new ArrayList<Integer>();
 			}
 			lInt.add(app.getPkApplication());
-			conflicts.put(new MyPoint(x, y), lInt);
+			conflicts.put(new Point(x, y), lInt);
 
 			keys = conflicts.keySet();
-			for (MyPoint p : keys) {
+			for (Point p : keys) {
 				if (conflicts.get(p).size() > 1) {
 					FacesContext.getCurrentInstance().addMessage(null,
 							new FacesMessage("Il existe un conflit entre plusieurs applications, Veuillez le corriger"));
@@ -97,15 +110,14 @@ public class ConfigDriveboxController implements Serializable {
 			}
 
 			boolean isInstalled = isInstalledApp(app.getPkApplication());
-			installedApp[x][y] = true;
-			// System.out.println("IsInstalled=" + isInstalled);
+			notInstalledApp[x][y] = true;
 			if (isInstalled) {
 				TDriveboxHasApplication dHA = dao.getInstalledAppFromPks(app.getPkApplication(), this.pkDrivebox);
 				if (dHA != null)
-					configFile = xml.UpdateConfigurationFile(dHA.getConfigurationXml(), x, y);
+					configFile = xml.updateConfigurationFile(dHA.getConfigurationXml(), x, y);
 			} else {
 
-				configFile = xml.UpdateConfigurationFile(app.getConfigurationSchema(), x, y);
+				configFile = xml.updateConfigurationFile(app.getConfigurationSchema(), x, y);
 			}
 			dao.updateInstalledApp(app.getPkApplication(), this.pkDrivebox, configFile);
 		} catch (NumberFormatException e) {
@@ -117,29 +129,47 @@ public class ConfigDriveboxController implements Serializable {
 		}
 	}
 
+	/**
+	 * Is called when an application is dropped
+	 * back from the dashboard to the applications grid
+	 * Controls the database updates
+	 * @param event The dropped application
+	 */
 	public void onDropBack(DragDropEvent event) {
 		TApplication app = (TApplication) event.getData();
 		System.out.println("onDropBack : pkApplication=" + app.getPkApplication() + " pkDrivebox=" + this.pkDrivebox);
 		dao.disableAppFromDrivebox(app.getPkApplication(), this.pkDrivebox);
-		Set<MyPoint> keys = conflicts.keySet();
-		for (MyPoint p : keys) {
+		Set<Point> keys = conflicts.keySet();
+		for (Point p : keys) {
 			List<Integer> lInt = conflicts.get(p);
 			lInt.remove((Object) app.getPkApplication());
 		}
 	}
 
+	/**
+	 * Get all the applications in the databases
+	 * @return A List containing all the applications 
+	 */
 	public List<TApplication> getlApp() {
 		List<TApplication> lApp = dao.getAllApps();
-		// System.out.println(selectedApps.size());
 		return lApp;
 	}
 
+	/**
+	 * Get all the Driveboxes of a user (use his login)
+	 * @return A List containing all the Driveboxes
+	 */
 	public List<TDrivebox> getDriveboxList() {
 		String login = FacesContext.getCurrentInstance().getExternalContext().getRemoteUser();
 		// System.out.println("getDriveboxList");
 		return dao.getDriveboxByLogin(login);
 	}
 
+	/**
+	 * Retrieve the selectionned Drivebox and loads
+	 * the driveboxConfig page 
+	 * @return
+	 */
 	public String editDrivebox() {
 		Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		String idStr = params.get("id");
@@ -149,19 +179,25 @@ public class ConfigDriveboxController implements Serializable {
 		return "driveboxConfig.xhtml";
 	}
 
-	public void showParams() {// int pk){
-		initializeInstalledApps();
-		// System.out.println("id=" + driveboxId);
-		// System.out.println("pk="+pk);
-	}
-
+	/**
+	 * Get the icon of the application installed on the (x:y) cell of the dashboard grid
+	 * @param x The x coordinates
+	 * @param y The y coordinates
+	 * @return The link to the icon
+	 */
 	public String installedAppIcon(int x, int y) {
 		if (isInstalledApp(x, y)) {
 			return app.getTApplication().getIcone();
 		}
-		return "";
+		return "noApp.png";
 	}
 	
+	/**
+	 * Get the name of the application installed on the (x:y) cell of the dashboard grid
+	 * @param x The x coordinates
+	 * @param y The y coordinates
+	 * @return The name of the application
+	 */
 	public String installedAppName(int x, int y){
 		if (isInstalledApp(x, y)) {
 			return app.getTApplication().getName();
@@ -169,11 +205,15 @@ public class ConfigDriveboxController implements Serializable {
 		return "";
 	}
 
+	/**
+	 * Checks if an application is currently installed on the (x:y) cell of the dashboard
+	 * @param x The x coordinates
+	 * @param y The y coordinates
+	 * @return True if an application is currently installed
+	 */
 	public boolean isInstalledApp(int x, int y) {
 		try {
 			List<TDriveboxHasApplication> installedApps = dao.getInstalledAppsFromPkDrivebox(this.pkDrivebox);
-			// System.out.println("Nombre d'app installées : "
-			// + installedApps.size());
 			for (TDriveboxHasApplication d : installedApps) {
 				if (xml.isAtPosition(d.getConfigurationXml(), x, y)) {
 					app = d;
@@ -188,46 +228,52 @@ public class ConfigDriveboxController implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Checks if an icon has to be displayed on the (x:y) cell of the dashboard
+	 * @param x The x coordinates
+	 * @param y The y coordinates
+	 * @return True if an icon has to be displayed 
+	 */
 	public boolean iconHasToBeDisplayed(int x, int y) {
-		return !installedApp[x][y];
+		return !notInstalledApp[x][y];
 	}
 
-	public boolean isInstalledApp(int pkDrivebox) {
-		// System.out.println("id=" + pkDrivebox);
+	/**
+	 * 
+	 * @param pkDrivebox
+	 * @return
+	 */
+	public boolean isInstalledApp(int pkApplication) {
 		List<TDriveboxHasApplication> installedApps = dao.getInstalledAppsFromPkDrivebox(this.pkDrivebox);
-		// System.out.println("Nombre d'app installées : " +
-		// installedApps.size());
 		for (TDriveboxHasApplication d : installedApps) {
-			if (d.getTApplication().getPkApplication() == pkDrivebox)
+			if (d.getTApplication().getPkApplication() == pkApplication)
 				return true;
 		}
 		return false;
 	}
 
-	public boolean isNotInstalledApp(int pk) {
-		// System.out.println("Is installed = " + isInstalledApp(id));
-		return !isInstalledApp(pk);
-	}
-
+	/**
+	 * Reinitialize the notInstalledApp tab and the conflicts Map
+	 */
 	public void initializeInstalledApps() {
-		for (int i = 0; i < installedApp.length; i++) {
-			for (int j = 0; j < installedApp[i].length; j++) {
-				installedApp[i][j] = false;
+		for (int i = 0; i < notInstalledApp.length; i++) {
+			for (int j = 0; j < notInstalledApp[i].length; j++) {
+				notInstalledApp[i][j] = false;
 			}
 		}
 		conflicts.clear();
 	}
 
+	/**
+	 * Saves the Drivebox parameters(name, transfert number and mute) in the database
+	 */
 	public void saveParams() {
-		System.out.println("saveParams");
 		String name = (String) nameInput.getValue();
 		String telNum = (String) numInput.getValue();
 		boolean mute = (Boolean) muteInput.getValue();
-		
 		nameInput.setValue("");
 		numInput.setValue("");
 		muteInput.setValue(false);
-//		System.out.println("name=" + name + " tel=" + telNum + " mute=" + mute);
 		dao.updateDrivebox(this.pkDrivebox, name, telNum, mute);
 		initializeInstalledApps();
 	}
@@ -259,41 +305,4 @@ public class ConfigDriveboxController implements Serializable {
 	public HtmlInputText getNameInput() {
 		return nameInput;
 	}
-}
-
-class MyPoint {
-	private int x;
-	private int y;
-
-	public MyPoint(int x, int y) {
-		super();
-		this.x = x;
-		this.y = y;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + x;
-		result = prime * result + y;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		MyPoint other = (MyPoint) obj;
-		if (x != other.x)
-			return false;
-		if (y != other.y)
-			return false;
-		return true;
-	}
-
 }

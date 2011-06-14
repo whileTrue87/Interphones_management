@@ -4,6 +4,11 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * This class represents a menuItem in the menu
+ * @author Maxime Reymond
+ *
+ */
 public class MenuItem {
 
 	private String name;
@@ -19,6 +24,11 @@ public class MenuItem {
 		this.acceptedRoles = acceptedRoles;
 	}
 
+	/**
+	 * Checks if a role in the acceptedRoles list is the same as the user's one
+	 * @param request The HttpServletRequest containing the role of the user
+	 * @return True if the role of the user is contained in the acceptedRoles List
+	 */
 	public boolean accepts(HttpServletRequest request) {
 		for (String role : acceptedRoles) {
 			if (request.isUserInRole(role))

@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import ch.suricatesolutions.dingdong.business.MenuItem;
 
 @ManagedBean
+/**
+ * Controls the display of the user menu
+ */
 public class MenuController {
 	private static final String ADMINISTRATORS="administrators";
 	private static final String USERS="users";
@@ -28,13 +31,18 @@ public class MenuController {
 		all.add(USERS);
 		
 		links.add(new MenuItem("Accueil", "/pages/home.xhtml", all));
-		links.add(new MenuItem("Configuration Drivebox", "/pages/user/listDrivebox.xhtml", users));
+		links.add(new MenuItem("Configuration Driveboxes", "/pages/user/listDrivebox.xhtml", users));
+		links.add(new MenuItem("Administration des Driveboxes", "", admins));
 	}
 
 	public List<MenuItem> getLinks() {
 		return links;
 	}
 	
+	/**
+	 * Destroy the session of the user
+	 * @return The next page to display
+	 */
 	public String  logout(){
 		Logger logger = Logger.getLogger("AuthenticationManager");
 		final HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest(); 
@@ -43,6 +51,11 @@ public class MenuController {
 		return "/pages/home.xhtml";
 	}
 	
+	/**
+	 * Checks if the users is authorized to see the given MenuItem
+	 * @param mi The MenuItem to check with the user
+	 * @return True if the user is authorized to see the MenuItem
+	 */
 	public boolean accepts(MenuItem mi){
 		HttpServletRequest request =  ((HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest());
 		return mi.accepts(request);

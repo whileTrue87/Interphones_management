@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<id>ch.suricate_solutions.dingdong.e_album</id>
+	<name>E-Album</name>
+	<version>0.0000.1</version>
+	<x_position>5</x_position>
+	<y_position>5</y_position>
+	<lastModification>2011-02-02T11:00:00</lastModification>
+	<filesPath>app/e-album/photos</filesPath>

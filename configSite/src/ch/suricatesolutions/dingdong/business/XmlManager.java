@@ -3,7 +3,6 @@ package ch.suricatesolutions.dingdong.business;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Random;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -17,43 +16,66 @@ import org.jdom.xpath.XPath;
 
 @EJB
 @Stateless
+/**
+ * Manage all the xml operations
+ * @author Maxime Reymond
+ */
 public class XmlManager {
 
-	public boolean isAtPosition(byte[] bs, int x, int y) throws JDOMException, IOException {
+	/**
+	 * Checks if the given (x:y) position is in the givent xml file
+	 * @param xml The xml file to check in
+	 * @param x The x coordinate of the position
+	 * @param y The y coordinate of the position
+	 * @return True if (x:y) is in the xml file
+	 * @throws JDOMException
+	 * @throws IOException
+	 */
+	public boolean isAtPosition(byte[] xml, int x, int y) throws JDOMException, IOException {
+		if(xml == null)
+			return false;
 		SAXBuilder sxb = new SAXBuilder();
 		Document doc = null;
-		doc = sxb.build(new ByteArrayInputStream(bs));
+		doc = sxb.build(new ByteArrayInputStream(xml));
 		Element root = doc.getRootElement();
 		XPath xpa = XPath.newInstance("/application/x_position");
 		Element eXPos = (Element) xpa.selectSingleNode(root);
+		if(eXPos == null)
+			return false;
 		boolean present = Integer.parseInt(eXPos.getText())==x;
 		xpa = XPath.newInstance("/application/y_position");
 		Element eYPos = (Element) xpa.selectSingleNode(root);
+		if(eYPos == null)
+			return false;
 		present &= Integer.parseInt(eYPos.getText())==y;
 		return present;
 	}
 
-	public byte[] updatePosition(byte[] old) {
-		System.out.println("Update position");
-		return null;
-	}
-
-	public byte[] UpdateConfigurationFile(byte[] configurationFile,
+	/**
+	 * Update the given configuration file with the (x:y) coordinates
+	 * @param configurationFile The configuration file to update
+	 * @param xPos The x coordinate
+	 * @param yPos The y coordinate
+	 * @return The updated configuration file
+	 * @throws JDOMException
+	 * @throws IOException
+	 */
+	public byte[] updateConfigurationFile(byte[] configurationFile,
 			int xPos, int yPos) throws JDOMException, IOException {
+		if(configurationFile== null)
+			return null;
 		SAXBuilder sxb = new SAXBuilder();
 		Document doc = null;
-		// List<InstitutionXml> institXmlList = null;
-
 		doc = sxb.build(new ByteArrayInputStream(configurationFile));
 		Element root = doc.getRootElement();
 		XPath xpa = XPath.newInstance("/application/x_position");
 		Element eXPos = (Element) xpa.selectSingleNode(root);
-//		System.out.println("old XPos="+eXPos.getText());
-		eXPos.setText(String.valueOf(xPos));
+		if(eXPos != null)
+			eXPos.setText(String.valueOf(xPos));
 		xpa = XPath.newInstance("/application/y_position");
 		Element eYPos = (Element) xpa.selectSingleNode(root);
-//		System.out.println("old YPos="+eYPos.getText());
-		eYPos.setText(String.valueOf(yPos));
+		if(eYPos != null)
+			eYPos.setText(String.valueOf(yPos));
 
 		XMLOutputter xmlOut = new XMLOutputter();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
