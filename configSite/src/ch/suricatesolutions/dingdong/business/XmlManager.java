@@ -3,6 +3,8 @@ package ch.suricatesolutions.dingdong.business;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -76,6 +78,38 @@ public class XmlManager {
 		Element eYPos = (Element) xpa.selectSingleNode(root);
 		if(eYPos != null)
 			eYPos.setText(String.valueOf(yPos));
+
+		XMLOutputter xmlOut = new XMLOutputter();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		xmlOut.output(doc, out);
+		out.close();
+		return out.toByteArray();
+	}
+
+	public byte[] createXmlDashboardConfigurationFile(Date lastModification, List<byte[]> list) throws JDOMException, IOException {
+		Element root = new Element("dashboard");
+		Element lastModif = new Element("lastModification");
+		Element apps = new Element("Applications");
+		root.addContent(lastModif);
+		root.addContent(apps);
+		
+		for(byte[] b : list){
+			Element app = new Element("application");
+			SAXBuilder sxb = new SAXBuilder();
+			Document doc = null;
+			doc = sxb.build(new ByteArrayInputStream(b));
+			Element appRoot = doc.getRootElement();
+			
+			app.setAttribute("xPos",appRoot.getChild("x_position").getText());
+			app.setAttribute("yPos",appRoot.getChild("y_position").getText());
+			app.setAttribute("version",appRoot.getChild("version").getText());
+			app.setAttribute("className",appRoot.getChild("id").getText());
+			
+			apps.addContent(app);
+		}
+		
+		Document doc = new Document();
+		doc.setRootElement(root);
 
 		XMLOutputter xmlOut = new XMLOutputter();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

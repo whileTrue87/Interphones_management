@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/jaxen-1.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/EclipseEE/plugins/oracle.eclipse.runtime.glassfish_3.1.0.0/glassfish3/glassfish/modules/gf-client-module.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

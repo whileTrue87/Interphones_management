@@ -45,20 +45,20 @@ public class ConfigDriveboxController implements Serializable {
 	@EJB
 	private XmlManager xml;
 
-	//Indicates if an application is not present before
-	//the loading of the page on the dashboard grid
-	//If a cell is false, an app is present
+	// Indicates if an application is not present before
+	// the loading of the page on the dashboard grid
+	// If a cell is false, an app is present
 	private boolean[][] notInstalledApp = new boolean[2][5];
 
-	//Map containing the possible conflicts on the dashboard grid
-	//Each entry(Point(x,y)) represent a list of present application
+	// Map containing the possible conflicts on the dashboard grid
+	// Each entry(Point(x,y)) represent a list of present application
 	private Map<Point, List<Integer>> conflicts = new HashMap<Point, List<Integer>>();
 
 	private SelectItem[] booleanOptions = new SelectItem[3];
 
 	private TDriveboxHasApplication app;
 
-	//Binding properties
+	// Binding properties
 	private HtmlInputText nameInput;
 	private HtmlInputText numInput;
 	private HtmlSelectBooleanCheckbox muteInput;
@@ -70,9 +70,11 @@ public class ConfigDriveboxController implements Serializable {
 	}
 
 	/**
-	 * Is called when an application is dropped
-	 * on the dashboard grid, controls the database updates
-	 * @param event The dropped application
+	 * Is called when an application is dropped on the dashboard grid, controls
+	 * the database updates
+	 * 
+	 * @param event
+	 *            The dropped application
 	 */
 	public void onDrop(DragDropEvent event) {
 		try {
@@ -100,8 +102,7 @@ public class ConfigDriveboxController implements Serializable {
 			keys = conflicts.keySet();
 			for (Point p : keys) {
 				if (conflicts.get(p).size() > 1) {
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage("Il existe un conflit entre plusieurs applications, Veuillez le corriger"));
+					addMessage(new FacesMessage("Il existe un conflit entre plusieurs applications, Veuillez le corriger"));
 					return;
 				}
 			}
@@ -120,20 +121,25 @@ public class ConfigDriveboxController implements Serializable {
 				configFile = xml.updateConfigurationFile(app.getConfigurationSchema(), x, y);
 			}
 			dao.updateInstalledApp(app.getPkApplication(), this.pkDrivebox, configFile);
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (JDOMException e) {
+		}  catch (JDOMException e) {
+			addMessage(new FacesMessage(e.getMessage()));
 			e.printStackTrace();
 		} catch (IOException e) {
+			addMessage(new FacesMessage(e.getMessage()));
 			e.printStackTrace();
 		}
 	}
 
+	private void addMessage(FacesMessage message) {
+		FacesContext.getCurrentInstance().addMessage(null, message);
+	}
+
 	/**
-	 * Is called when an application is dropped
-	 * back from the dashboard to the applications grid
-	 * Controls the database updates
-	 * @param event The dropped application
+	 * Is called when an application is dropped back from the dashboard to the
+	 * applications grid Controls the database updates
+	 * 
+	 * @param event
+	 *            The dropped application
 	 */
 	public void onDropBack(DragDropEvent event) {
 		TApplication app = (TApplication) event.getData();
@@ -148,7 +154,8 @@ public class ConfigDriveboxController implements Serializable {
 
 	/**
 	 * Get all the applications in the databases
-	 * @return A List containing all the applications 
+	 * 
+	 * @return A List containing all the applications
 	 */
 	public List<TApplication> getlApp() {
 		List<TApplication> lApp = dao.getAllApps();
@@ -157,17 +164,17 @@ public class ConfigDriveboxController implements Serializable {
 
 	/**
 	 * Get all the Driveboxes of a user (use his login)
+	 * 
 	 * @return A List containing all the Driveboxes
 	 */
 	public List<TDrivebox> getDriveboxList() {
 		String login = FacesContext.getCurrentInstance().getExternalContext().getRemoteUser();
-		// System.out.println("getDriveboxList");
 		return dao.getDriveboxByLogin(login);
 	}
 
 	/**
-	 * Retrieve the selectionned Drivebox and loads
-	 * the driveboxConfig page 
+	 * Retrieve the selectionned Drivebox and loads the driveboxConfig page
+	 * 
 	 * @return
 	 */
 	public String editDrivebox() {
@@ -180,9 +187,13 @@ public class ConfigDriveboxController implements Serializable {
 	}
 
 	/**
-	 * Get the icon of the application installed on the (x:y) cell of the dashboard grid
-	 * @param x The x coordinates
-	 * @param y The y coordinates
+	 * Get the icon of the application installed on the (x:y) cell of the
+	 * dashboard grid
+	 * 
+	 * @param x
+	 *            The x coordinates
+	 * @param y
+	 *            The y coordinates
 	 * @return The link to the icon
 	 */
 	public String installedAppIcon(int x, int y) {
@@ -191,14 +202,18 @@ public class ConfigDriveboxController implements Serializable {
 		}
 		return "noApp.png";
 	}
-	
+
 	/**
-	 * Get the name of the application installed on the (x:y) cell of the dashboard grid
-	 * @param x The x coordinates
-	 * @param y The y coordinates
+	 * Get the name of the application installed on the (x:y) cell of the
+	 * dashboard grid
+	 * 
+	 * @param x
+	 *            The x coordinates
+	 * @param y
+	 *            The y coordinates
 	 * @return The name of the application
 	 */
-	public String installedAppName(int x, int y){
+	public String installedAppName(int x, int y) {
 		if (isInstalledApp(x, y)) {
 			return app.getTApplication().getName();
 		}
@@ -206,9 +221,13 @@ public class ConfigDriveboxController implements Serializable {
 	}
 
 	/**
-	 * Checks if an application is currently installed on the (x:y) cell of the dashboard
-	 * @param x The x coordinates
-	 * @param y The y coordinates
+	 * Checks if an application is currently installed on the (x:y) cell of the
+	 * dashboard
+	 * 
+	 * @param x
+	 *            The x coordinates
+	 * @param y
+	 *            The y coordinates
 	 * @return True if an application is currently installed
 	 */
 	public boolean isInstalledApp(int x, int y) {
@@ -221,8 +240,10 @@ public class ConfigDriveboxController implements Serializable {
 				}
 			}
 		} catch (JDOMException e) {
+			addMessage(new FacesMessage(e.getMessage()));
 			e.printStackTrace();
 		} catch (IOException e) {
+			addMessage(new FacesMessage(e.getMessage()));
 			e.printStackTrace();
 		}
 		return false;
@@ -230,9 +251,12 @@ public class ConfigDriveboxController implements Serializable {
 
 	/**
 	 * Checks if an icon has to be displayed on the (x:y) cell of the dashboard
-	 * @param x The x coordinates
-	 * @param y The y coordinates
-	 * @return True if an icon has to be displayed 
+	 * 
+	 * @param x
+	 *            The x coordinates
+	 * @param y
+	 *            The y coordinates
+	 * @return True if an icon has to be displayed
 	 */
 	public boolean iconHasToBeDisplayed(int x, int y) {
 		return !notInstalledApp[x][y];
@@ -265,7 +289,8 @@ public class ConfigDriveboxController implements Serializable {
 	}
 
 	/**
-	 * Saves the Drivebox parameters(name, transfert number and mute) in the database
+	 * Saves the Drivebox parameters(name, transfert number and mute) in the
+	 * database
 	 */
 	public void saveParams() {
 		String name = (String) nameInput.getValue();

@@ -2,6 +2,7 @@ package ch.suricatesolutions.dingdong.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
 import java.util.List;
 
 
@@ -13,6 +14,8 @@ import java.util.List;
 @Table(name="t_application")
 @NamedQueries({ @NamedQuery(name = "TApplication.allApps", query = "SELECT a FROM TApplication a"),
 	@NamedQuery(name = "TApplication.selectedAppsFromId", query = "SELECT a FROM TApplication a JOIN a.TDriveboxHasApplications d WHERE d.id.pfkDrivebox=:id"),
+	@NamedQuery(name = "TApplication.AppFromId", query = "SELECT a FROM TApplication a WHERE a.id=:id"),
+	@NamedQuery(name = "TApplication.pkFromId", query = "SELECT a.pkApplication FROM TApplication a WHERE a.id=:id")
 })
 	
 	public class TApplication implements Serializable {

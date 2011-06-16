@@ -23,6 +23,10 @@ public class TDriveboxHasApplication implements Serializable {
     @Lob()
 	@Column(name="configuration_xml")
 	private byte[] configurationXml;
+    
+    @Lob()
+    @Column(name="parameters")
+	private byte[] parameters;
 
 	//bi-directional many-to-one association to TApplication
     @ManyToOne
@@ -77,6 +81,14 @@ public class TDriveboxHasApplication implements Serializable {
 
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+	public void setParameters(byte[] parameters) {
+		this.parameters = parameters;
+	}
+
+	public byte[] getParameters() {
+		return parameters;
 	}
 	
 }

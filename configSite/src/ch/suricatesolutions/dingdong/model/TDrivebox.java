@@ -3,6 +3,7 @@ package ch.suricatesolutions.dingdong.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -14,7 +15,8 @@ import java.util.List;
 @Table(name="t_drivebox")
 @NamedQueries({ @NamedQuery(name = "TDrivebox.driveboxFromUser", query = "SELECT d FROM TDrivebox d JOIN d.TClient c WHERE c.login=:login"),
 	@NamedQuery(name = "TDrivebox.pkFromId", query = "SELECT d.pkDrivebox FROM TDrivebox d WHERE d.idDrivebox=:id"),
-	@NamedQuery(name = "TDrivebox.getDriveboxFromPk", query = "SELECT d FROM TDrivebox d WHERE d.pkDrivebox=:pkDrivebox")	
+	@NamedQuery(name = "TDrivebox.getDriveboxFromPk", query = "SELECT d FROM TDrivebox d WHERE d.pkDrivebox=:pkDrivebox"),	
+	@NamedQuery(name = "TDrivebox.lastDashboardModification", query = "SELECT d.lastDashboardModification FROM TDrivebox d WHERE d.idDrivebox=:id")	
 })
 
 public class TDrivebox implements Serializable {
@@ -31,6 +33,10 @@ public class TDrivebox implements Serializable {
 	private boolean mute;
 	
 	private String name;
+	
+	@Temporal( TemporalType.TIMESTAMP)
+	@Column(name="last_dashboard_modification")
+	private Date lastDashboardModification;
 
 	//bi-directional many-to-one association to TClient
     @ManyToOne
@@ -135,6 +141,14 @@ public class TDrivebox implements Serializable {
 
 	public String getName() {
 		return name;
+	}
+
+	public void setLastDashboardModification(Date lastDashboardModification) {
+		this.lastDashboardModification = lastDashboardModification;
+	}
+
+	public Date getLastDashboardModification() {
+		return lastDashboardModification;
 	}
 	
 }

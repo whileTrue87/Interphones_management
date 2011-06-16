@@ -1,5 +1,7 @@
 package ch.suricatesolutions.dingdong.business;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -10,6 +12,7 @@ import javax.persistence.PersistenceContext;
 
 import ch.suricatesolutions.dingdong.model.TApplication;
 import ch.suricatesolutions.dingdong.model.TDrivebox;
+import ch.suricatesolutions.dingdong.model.TDriveboxCore;
 import ch.suricatesolutions.dingdong.model.TDriveboxHasApplication;
 import ch.suricatesolutions.dingdong.model.TTransfertNumber;
 
@@ -20,6 +23,10 @@ import ch.suricatesolutions.dingdong.model.TTransfertNumber;
  * @author Maxime Reymond
  */
 public class DaoManager {
+
+	public DaoManager(){
+		
+	}
 
 	@PersistenceContext(unitName = "DingDong")
 	private EntityManager em;
@@ -45,7 +52,7 @@ public class DaoManager {
 
 	/**
 	 * Get all the applications already installed on the given drivebox
-	 * @param pkDrivebox The primary key of the driveboy
+	 * @param pkDrivebox The primary key of the drivebox
 	 * @return A List containing all the installed applications of the given drivebox
 	 */
 	public List<TDriveboxHasApplication> getInstalledAppsFromPkDrivebox(int pkDrivebox) {
@@ -64,8 +71,6 @@ public class DaoManager {
 		em.flush();
 		TDriveboxHasApplication t = getInstalledAppFromPks(pkApplication, pkDrivebox);
 		if (t == null) {
-			// System.out.println("pkApp=" + pkApplication);
-			// System.out.println("pkDrivebox=" + pkDrivebox);
 			em.createNativeQuery("INSERT INTO t_drivebox_has_application VALUES(?, ?, ?, ?)").setParameter(1, pkDrivebox)
 					.setParameter(2, pkApplication).setParameter(3, configFile).setParameter(4, true).executeUpdate();
 		} else {
@@ -73,8 +78,6 @@ public class DaoManager {
 			t.setEnabled(true);
 			em.persist(t);
 		}
-		// System.out.printf("Update app:%d of drivebox:%d\n", pkApplication,
-		// pkDrivebox);
 	}
 
 	/**
@@ -103,7 +106,7 @@ public class DaoManager {
 	 */
 	public int getDriveboxPkFromId(String id) {
 		em.flush();
-		return em.createNamedQuery("TApplication.pkFromId", Integer.class).setParameter(":id", id).getSingleResult();
+		return em.createNamedQuery("TDrivebox.pkFromId", Integer.class).setParameter("id", id).getSingleResult();
 	}
 
 	/**
@@ -142,5 +145,49 @@ public class DaoManager {
 			em.createNativeQuery("INSERT INTO t_transfert_number VALUES(?, ?, ?)").setParameter(1, 0).setParameter(2, telNum).setParameter(3, pkDrivebox)
 					.executeUpdate();
 		}
+	}
+
+	public String getLatestCoreVersionNumber() {
+		em.flush();
+		return em.createNamedQuery("TDriveboxCore.LatestCoreVersionNumber",String.class).setMaxResults(1).getSingleResult();
+	}
+
+	public byte[] getLatestCore() {
+		em.flush();
+		return em.createNamedQuery("TDriveboxCore.LatestCore",byte[].class).setMaxResults(1).getSingleResult();
+	}
+	
+	public List<byte[]> getAppConfigFilesFromDriveboxId(String driveboxId){
+		int pkDrivebox = this.getDriveboxPkFromId(driveboxId);
+		List<TDriveboxHasApplication> list = this.getInstalledAppsFromPkDrivebox(pkDrivebox);
+		List<byte[]> configFiles = new ArrayList<byte[]>();
+		for(TDriveboxHasApplication dha : list){
+			configFiles.add(dha.getConfigurationXml());
+		}
+		return configFiles;
+	}
+
+	public TApplication getApplicationFromId(String applicationId) {
+		em.flush();
+		TApplication ta = em.createNamedQuery("TApplication.AppFromId",TApplication.class).setParameter("id", applicationId).getSingleResult();
+		System.out.println("hahahahaahahahahahah"+ta.getDriveboxApplication());
+
+		return ta;
+	}
+
+	public TDriveboxHasApplication getInstalledAppFromIds(String applicationId, String driveboxId) {
+		int pkDrivebox = this.getDriveboxPkFromId(driveboxId);
+		int pkApplication = this.getApplicationPkFromId(applicationId);
+		return this.getInstalledAppFromPks(pkApplication, pkDrivebox);
+	}
+
+	private int getApplicationPkFromId(String applicationId) {
+		em.flush();
+		return em.createNamedQuery("TApplication.pkFromId", Integer.class).setParameter("id", applicationId).getSingleResult();
+	}
+
+	public Date getLastDashboardModification(String driveboxId) {
+		em.flush();
+		return em.createNamedQuery("TDrivebox.lastDashboardModification", Date.class).setParameter("id", driveboxId).getSingleResult();
 	}
 }
