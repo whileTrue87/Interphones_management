@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<core>
+	<version>1.0.0.3</version>
+	<mainClass>ch.suricatesolutions.driveboxmgmttool.ToolCore</mainClass>
+</core>
