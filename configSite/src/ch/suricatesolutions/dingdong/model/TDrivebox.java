@@ -2,7 +2,6 @@ package ch.suricatesolutions.dingdong.model;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import java.util.List;
 	@NamedQuery(name = "TDrivebox.getDriveboxFromPk", query = "SELECT d FROM TDrivebox d WHERE d.pkDrivebox=:pkDrivebox"),	
 	@NamedQuery(name = "TDrivebox.lastDashboardModification", query = "SELECT d.lastDashboardModification FROM TDrivebox d WHERE d.idDrivebox=:id")	
 })
-
 public class TDrivebox implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -30,13 +28,16 @@ public class TDrivebox implements Serializable {
 	@Column(name="id_drivebox")
 	private String idDrivebox;
 
-	private boolean mute;
-	
-	private String name;
-	
-	@Temporal( TemporalType.TIMESTAMP)
+    @Temporal( TemporalType.TIMESTAMP)
 	@Column(name="last_dashboard_modification")
 	private Date lastDashboardModification;
+
+	private boolean mute;
+	
+	@Column(name="ip_address")
+	private String ipAddress;
+
+	private String name;
 
 	//bi-directional many-to-one association to TClient
     @ManyToOne
@@ -59,6 +60,10 @@ public class TDrivebox implements Serializable {
 	//bi-directional many-to-one association to TDriveboxHasApplication
 	@OneToMany(mappedBy="TDrivebox")
 	private List<TDriveboxHasApplication> TDriveboxHasApplications;
+
+	//bi-directional many-to-one association to TDriveboxHasOtherSoft
+	@OneToMany(mappedBy="TDrivebox")
+	private List<TDriveboxHasOtherSoft> TDriveboxHasOtherSofts;
 
 	//bi-directional many-to-many association to TSipphone
 	@ManyToMany(mappedBy="TDriveboxs2")
@@ -87,12 +92,28 @@ public class TDrivebox implements Serializable {
 		this.idDrivebox = idDrivebox;
 	}
 
+	public Date getLastDashboardModification() {
+		return this.lastDashboardModification;
+	}
+
+	public void setLastDashboardModification(Date lastDashboardModification) {
+		this.lastDashboardModification = lastDashboardModification;
+	}
+
 	public boolean getMute() {
 		return this.mute;
 	}
 
 	public void setMute(boolean mute) {
 		this.mute = mute;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public TClient getTClient() {
@@ -119,6 +140,14 @@ public class TDrivebox implements Serializable {
 		this.TDriveboxHasApplications = TDriveboxHasApplications;
 	}
 	
+	public List<TDriveboxHasOtherSoft> getTDriveboxHasOtherSofts() {
+		return this.TDriveboxHasOtherSofts;
+	}
+
+	public void setTDriveboxHasOtherSofts(List<TDriveboxHasOtherSoft> TDriveboxHasOtherSofts) {
+		this.TDriveboxHasOtherSofts = TDriveboxHasOtherSofts;
+	}
+	
 	public List<TSipphone> getTSipphones2() {
 		return this.TSipphones2;
 	}
@@ -135,20 +164,12 @@ public class TDrivebox implements Serializable {
 		this.TTransfertNumbers = TTransfertNumbers;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setLastDashboardModification(Date lastDashboardModification) {
-		this.lastDashboardModification = lastDashboardModification;
-	}
-
-	public Date getLastDashboardModification() {
-		return lastDashboardModification;
+	public String getIpAddress() {
+		return ipAddress;
 	}
 	
 }

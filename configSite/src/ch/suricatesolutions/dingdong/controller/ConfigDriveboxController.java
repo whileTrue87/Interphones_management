@@ -1,7 +1,10 @@
 package ch.suricatesolutions.dingdong.controller;
 
 import java.awt.Point;
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.EJB;
+import javax.el.ELContext;
+import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -17,16 +22,21 @@ import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlSelectBooleanCheckbox;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
-import org.jdom.JDOMException;
+import org.primefaces.component.dialog.Dialog;
 import org.primefaces.component.dnd.Droppable;
 import org.primefaces.event.DragDropEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 import ch.suricatesolutions.dingdong.business.DaoManager;
-import ch.suricatesolutions.dingdong.business.XmlManager;
+import ch.suricatesolutions.dingdong.controller.app.ParamController;
 import ch.suricatesolutions.dingdong.model.TApplication;
 import ch.suricatesolutions.dingdong.model.TDrivebox;
 import ch.suricatesolutions.dingdong.model.TDriveboxHasApplication;
+import ch.suricatesolutions.dingdong.updates.Update;
 
 @ManagedBean
 @SessionScoped
@@ -41,9 +51,12 @@ public class ConfigDriveboxController implements Serializable {
 
 	@EJB
 	private DaoManager dao;
+	//
+	// @EJB
+	// private UpdateManager update;
 
-	@EJB
-	private XmlManager xml;
+	// @EJB
+	// private XmlManager xml;
 
 	// Indicates if an application is not present before
 	// the loading of the page on the dashboard grid
@@ -62,11 +75,22 @@ public class ConfigDriveboxController implements Serializable {
 	private HtmlInputText nameInput;
 	private HtmlInputText numInput;
 	private HtmlSelectBooleanCheckbox muteInput;
+	private Dialog dialog;
+	private InputStream noApp;
 
-	public ConfigDriveboxController() {
+	public Dialog getDialog() {
+		return dialog;
+	}
+
+	public void setDialog(Dialog dialog) {
+		this.dialog = dialog;
+	}
+
+	public ConfigDriveboxController() throws FileNotFoundException {
 		booleanOptions[0] = new SelectItem("");
 		booleanOptions[1] = new SelectItem(String.valueOf(true));
 		booleanOptions[2] = new SelectItem(String.valueOf(false));
+		noApp = new FileInputStream("C:\\noApp.png");
 	}
 
 	/**
@@ -77,57 +101,40 @@ public class ConfigDriveboxController implements Serializable {
 	 *            The dropped application
 	 */
 	public void onDrop(DragDropEvent event) {
-		try {
-			TApplication app = (TApplication) event.getData();
-			Droppable d = (Droppable) event.getSource();
-			String id = d.getId();
-			String[] tokens = id.split("_");
-			byte[] configFile = null;
-			int x = Integer.parseInt(tokens[1]);
-			int y = Integer.parseInt(tokens[2]);
+		TApplication app = (TApplication) event.getData();
+		Droppable d = (Droppable) event.getSource();
+		String id = d.getId();
+		String[] tokens = id.split("_");
+		int x = Integer.parseInt(tokens[1]);
+		int y = Integer.parseInt(tokens[2]);
 
-			Set<Point> keys = conflicts.keySet();
-			for (Point p : keys) {
-				List<Integer> lInt = conflicts.get(p);
-				lInt.remove((Object) app.getPkApplication());
-			}
-
-			List<Integer> lInt = conflicts.get(new Point(x, y));
-			if (lInt == null) {
-				lInt = new ArrayList<Integer>();
-			}
-			lInt.add(app.getPkApplication());
-			conflicts.put(new Point(x, y), lInt);
-
-			keys = conflicts.keySet();
-			for (Point p : keys) {
-				if (conflicts.get(p).size() > 1) {
-					addMessage(new FacesMessage("Il existe un conflit entre plusieurs applications, Veuillez le corriger"));
-					return;
-				}
-			}
-			if (isInstalledApp(x, y)) {
-				dao.disableAppFromDrivebox(this.app.getId().getPfkApplication(), this.app.getId().getPfkDrivebox());
-			}
-
-			boolean isInstalled = isInstalledApp(app.getPkApplication());
-			notInstalledApp[x][y] = true;
-			if (isInstalled) {
-				TDriveboxHasApplication dHA = dao.getInstalledAppFromPks(app.getPkApplication(), this.pkDrivebox);
-				if (dHA != null)
-					configFile = xml.updateConfigurationFile(dHA.getConfigurationXml(), x, y);
-			} else {
-
-				configFile = xml.updateConfigurationFile(app.getConfigurationSchema(), x, y);
-			}
-			dao.updateInstalledApp(app.getPkApplication(), this.pkDrivebox, configFile);
-		}  catch (JDOMException e) {
-			addMessage(new FacesMessage(e.getMessage()));
-			e.printStackTrace();
-		} catch (IOException e) {
-			addMessage(new FacesMessage(e.getMessage()));
-			e.printStackTrace();
+		Set<Point> keys = conflicts.keySet();
+		for (Point p : keys) {
+			List<Integer> lInt = conflicts.get(p);
+			lInt.remove((Object) app.getPkApplication());
 		}
+
+		List<Integer> lInt = conflicts.get(new Point(x, y));
+		if (lInt == null) {
+			lInt = new ArrayList<Integer>();
+		}
+		lInt.add(app.getPkApplication());
+		conflicts.put(new Point(x, y), lInt);
+
+		keys = conflicts.keySet();
+		for (Point p : keys) {
+			if (conflicts.get(p).size() > 1) {
+				addMessage(new FacesMessage("Il existe un conflit entre plusieurs applications, Veuillez le corriger"));
+				return;
+			}
+		}
+		if (isInstalledApp(x, y)) {
+			dao.disableAppFromDrivebox(this.app.getId().getPfkApplication(), this.app.getId().getPfkDrivebox());
+		}
+
+		notInstalledApp[x][y] = true;
+		dao.updateInstalledApp(app.getPkApplication(), this.pkDrivebox, x, y);
+
 	}
 
 	private void addMessage(FacesMessage message) {
@@ -143,7 +150,8 @@ public class ConfigDriveboxController implements Serializable {
 	 */
 	public void onDropBack(DragDropEvent event) {
 		TApplication app = (TApplication) event.getData();
-		System.out.println("onDropBack : pkApplication=" + app.getPkApplication() + " pkDrivebox=" + this.pkDrivebox);
+		// System.out.println("onDropBack : pkApplication=" +
+		// app.getPkApplication() + " pkDrivebox=" + this.pkDrivebox);
 		dao.disableAppFromDrivebox(app.getPkApplication(), this.pkDrivebox);
 		Set<Point> keys = conflicts.keySet();
 		for (Point p : keys) {
@@ -196,11 +204,16 @@ public class ConfigDriveboxController implements Serializable {
 	 *            The y coordinates
 	 * @return The link to the icon
 	 */
-	public String installedAppIcon(int x, int y) {
+	public StreamedContent installedAppIcon(int x, int y) {
 		if (isInstalledApp(x, y)) {
-			return app.getTApplication().getIcone();
+			return new DefaultStreamedContent(new ByteArrayInputStream(app.getTApplication().getIcone()), "image/png");
 		}
-		return "noApp.png";
+		try {
+			return new DefaultStreamedContent(new FileInputStream("c:\\noApp.png"), "image/png");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -231,20 +244,12 @@ public class ConfigDriveboxController implements Serializable {
 	 * @return True if an application is currently installed
 	 */
 	public boolean isInstalledApp(int x, int y) {
-		try {
-			List<TDriveboxHasApplication> installedApps = dao.getInstalledAppsFromPkDrivebox(this.pkDrivebox);
-			for (TDriveboxHasApplication d : installedApps) {
-				if (xml.isAtPosition(d.getConfigurationXml(), x, y)) {
-					app = d;
-					return true;
-				}
+		List<TDriveboxHasApplication> installedApps = dao.getInstalledAppsFromPkDrivebox(this.pkDrivebox);
+		for (TDriveboxHasApplication d : installedApps) {
+			if (d.getxPosition() == x && d.getyPosition() == y) {
+				app = d;
+				return true;
 			}
-		} catch (JDOMException e) {
-			addMessage(new FacesMessage(e.getMessage()));
-			e.printStackTrace();
-		} catch (IOException e) {
-			addMessage(new FacesMessage(e.getMessage()));
-			e.printStackTrace();
 		}
 		return false;
 	}
@@ -300,7 +305,32 @@ public class ConfigDriveboxController implements Serializable {
 		numInput.setValue("");
 		muteInput.setValue(false);
 		dao.updateDrivebox(this.pkDrivebox, name, telNum, mute);
-		initializeInstalledApps();
+		addMessage(new FacesMessage("Données mises à jour"));
+		// initializeInstalledApps();
+	}
+
+	public String updateParam(int pkApplication) {
+		TApplication app = dao.getApplicationFromPk(pkApplication);
+		String nextPage = app.getConfigurationLink();
+		ParamController param = (ParamController) getManagedBean("paramController");
+		// System.out.println(app.getBackBeanName());
+		param.setBackBeanName(app.getBackBeanName());
+		param.setPkApplication(pkApplication);
+		param.setPkDrivebox(pkDrivebox);
+		// System.out.println("Next Page = " + nextPage);
+		return "app/" + nextPage;
+	}
+
+	public StreamedContent getAppIconStream() {// String id){
+		String pkStr = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pkApp");
+		// System.out.println("Id de l'application : " + pkStr);
+		if (pkStr == null || pkStr.equals(""))
+			return new DefaultStreamedContent(noApp);
+		int pk = Integer.parseInt(pkStr);
+
+		byte[] icon = dao.getApplicationFromPk(pk).getIcone();
+		// System.out.println(icon.length);
+		return new DefaultStreamedContent(new ByteArrayInputStream(icon), "image/png");
 	}
 
 	public SelectItem[] getBooleanOptions() {
@@ -329,5 +359,40 @@ public class ConfigDriveboxController implements Serializable {
 
 	public HtmlInputText getNameInput() {
 		return nameInput;
+	}
+
+	public Object getManagedBean(final String beanName) {
+		FacesContext fc = FacesContext.getCurrentInstance();
+
+		Object bean;
+		try {
+			ELContext elContext = fc.getELContext();
+			bean = elContext.getELResolver().getValue(elContext, null, beanName);
+		} catch (RuntimeException e) {
+			throw new FacesException(e.getMessage(), e);
+		}
+
+		if (bean == null) {
+			throw new FacesException("Managed bean with name '" + beanName
+					+ "' was not found. Check your faces-config.xml or @ManagedBean annotation.");
+		}
+		return bean;
+	}
+
+	public void updateDrivebox() {
+		InitialContext ic;
+		System.out.println("update Drivebox");
+		try {
+			ic = new InitialContext();
+			Update update = (Update) ic.lookup("java:global/Interphones_management/UpdateManager");
+			boolean ok = update.updateDrivebox(this.pkDrivebox);
+			if (ok)
+				addMessage(new FacesMessage("La Drivebox a été avertie de la mise à jour"));
+			else
+				addMessage(new FacesMessage("La Drivebox n'a pas pu être contactée"));
+		} catch (Exception e) {
+			addMessage(new FacesMessage("La Drivebox n'a pas pu être contactée"));
+			e.printStackTrace();
+		}
 	}
 }

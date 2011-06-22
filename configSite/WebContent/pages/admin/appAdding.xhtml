@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="/templates/base.xhtml">
+
+	<ui:define name="title">Liste des applications</ui:define>
+	<ui:define name="menu"></ui:define>
+	<ui:define name="title_page">Liste des applications</ui:define>
+	<ui:define name="content">
+	<p:messages id="errorSup"/>
+		<h:form id="existingApps">
+		
+			<p:dataTable var="app" value="#{addApplicationController.appsList}"
+				id="allApps"
+				emptyMessage="Il n'existe actuellement aucune application">
+
+				<!-- Contract's name -->
+				<p:column filterBy="#{app.name}" headerText="Nom"
+					filterMatchMode="contains" filterStyle="width: 5em"
+					style="width: 15%">
+					<h:outputText value="#{app.name}" />
+				</p:column>
+				<p:column filterBy="#{app.id}" headerText="ID"
+					filterMatchMode="contains" filterStyle="width: 5em">
+					<h:outputText value="#{app.id}" />
+				</p:column>
+				<p:column filterBy="#{app.version}" headerText="Version"
+					filterMatchMode="contains" filterStyle="width: 5em"
+					style="width: 20%">
+					<h:outputText value="#{app.version}" />
+				</p:column>
+				<p:column headerText="Suppression"
+					style="width: 10%; text-align:center">
+					<p:commandButton title="Supprimer l'application"
+						onclick="confirmation.show()"
+						actionListener="#{addApplicationController.setApplicationToDelete(app.pkApplication)}"
+						image="ui-icon-closethick" ajax="true" />
+				</p:column>
+
+			</p:dataTable>
+			<p:confirmDialog
+				message="Etes-vous sûr de vouloir supprimer cette application?"
+				showEffect="fade" header="Supprimer l'application?" severity="alert"
+				widgetVar="confirmation">
+
+				<p:commandButton value="Oui" update="existingApps errorSup"
+					oncomplete="confirmation.hide()"
+					actionListener="#{addApplicationController.delete}" />
+				<p:commandButton value="Non" onclick="confirmation.hide()"
+					type="button" />
+
+			</p:confirmDialog>
+		</h:form>
+		<br />
+		<br />
+		<h2>Ajouter une application</h2>
+		<h:form id="appForm">
+			<h:outputLabel for="file" value="Sélectionnez une archive JAR : " />
+			<p:fileUpload id="file" auto="true" customUI="true"
+				fileUploadListener="#{addApplicationController.handleFileUpload}"
+				allowTypes="*.jar" description="Archive JAR"
+				update="uploadInfo existingApps errors"/>
+			<p:message id="msgfile" for="file" />
+			<p:messages id="errors" showDetail="false"/>
+
+			<br />
+		</h:form>
+		<h:form id="uploadInfo">
+			<p:panel rendered="#{addApplicationController.panelRender}">
+				<p>
+					<h:outputLabel for="id" value="ID : " />
+					<h:outputText value="#{addApplicationController.uploadedApp.id}"
+						id="id" />
+				</p>
+				<p>
+					<h:outputLabel for="name" value="Nom : " />
+					<h:outputText value="#{addApplicationController.uploadedApp.name}"
+						id="name" />
+				</p>
+				<p>
+					<h:outputLabel for="version" value="Version : " />
+					<h:outputText
+						value="#{addApplicationController.uploadedApp.version}"
+						id="version" />
+				</p>
+			</p:panel>
+		</h:form>
+		<br />
+		<h2>Copie de toutes les applications sur le disque</h2>
+		<h:form id="copyApps">
+			<p:commandButton value="Copie"
+				action="#{addApplicationController.copyAllAppsOnDisk}" />
+		</h:form>
+	</ui:define>
+</ui:composition>

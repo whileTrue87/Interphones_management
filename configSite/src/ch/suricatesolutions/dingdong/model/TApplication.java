@@ -15,10 +15,12 @@ import java.util.List;
 @NamedQueries({ @NamedQuery(name = "TApplication.allApps", query = "SELECT a FROM TApplication a"),
 	@NamedQuery(name = "TApplication.selectedAppsFromId", query = "SELECT a FROM TApplication a JOIN a.TDriveboxHasApplications d WHERE d.id.pfkDrivebox=:id"),
 	@NamedQuery(name = "TApplication.AppFromId", query = "SELECT a FROM TApplication a WHERE a.id=:id"),
+	@NamedQuery(name = "TApplication.AppFromPk", query = "SELECT a FROM TApplication a WHERE a.pkApplication=:pk"),
 	@NamedQuery(name = "TApplication.pkFromId", query = "SELECT a.pkApplication FROM TApplication a WHERE a.id=:id")
 })
-	
-	public class TApplication implements Serializable {
+@NamedNativeQueries({ @NamedNativeQuery(name = "TApplication.insertNewApplication", query = "INSERT INTO t_application (pk_application, configuration_schema, drivebox_application, id, version, icone, name, configuration_link, configuration_page, back_bean_name, back_bean) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")}) 
+
+public class TApplication implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -36,13 +38,26 @@ import java.util.List;
     @Lob()
 	@Column(name="drivebox_application")
 	private byte[] driveboxApplication;
+    
+    @Lob()
+	@Column(name="configuration_page")
+	private byte[] configurationPage;
 
-	private String icone;
+    @Lob()
+	private byte[] icone;
 
 	private String id;
+
 	private String name;
 
 	private String version;
+	
+	@Column(name="back_bean_name")
+	private String backBeanName;
+	
+	@Lob()
+	@Column(name="back_bean")
+	private byte[] backBean;
 
 	//bi-directional many-to-one association to TDriveboxHasApplication
 	@OneToMany(mappedBy="TApplication")
@@ -83,11 +98,11 @@ import java.util.List;
 		this.driveboxApplication = driveboxApplication;
 	}
 
-	public String getIcone() {
+	public byte[] getIcone() {
 		return this.icone;
 	}
 
-	public void setIcone(String icone) {
+	public void setIcone(byte[] icone) {
 		this.icone = icone;
 	}
 
@@ -97,6 +112,14 @@ import java.util.List;
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getVersion() {
@@ -115,12 +138,28 @@ import java.util.List;
 		this.TDriveboxHasApplications = TDriveboxHasApplications;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setConfigurationPage(byte[] configurationPage) {
+		this.configurationPage = configurationPage;
 	}
 
-	public String getName() {
-		return name;
+	public byte[] getConfigurationPage() {
+		return configurationPage;
+	}
+
+	public void setBackBeanName(String backBeanName) {
+		this.backBeanName = backBeanName;
+	}
+
+	public String getBackBeanName() {
+		return backBeanName;
+	}
+
+	public void setBackBean(byte[] backBean) {
+		this.backBean = backBean;
+	}
+
+	public byte[] getBackBean() {
+		return backBean;
 	}
 	
 }

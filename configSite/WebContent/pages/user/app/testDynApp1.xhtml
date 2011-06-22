@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="/templates/conf_app_base.xhtml">
+
+	<ui:define name="app_name">Application 1</ui:define>
+	<ui:define name="param_content">
+		<h:outputLabel for="file" value="Fichier du contrat: " />
+			<p:fileUpload id="file" auto="true" multiple="true"
+				fileUploadListener="#{paramController.handleFileUpload}"
+				allowTypes="*.jpg;*.png;*.gif;" description="Photos" update="uploadInfo"/>
+			<p:message id="msgfile" for="file" />
+	</ui:define>
+</ui:composition>

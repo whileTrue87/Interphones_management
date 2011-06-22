@@ -12,5 +12,8 @@
     <class>ch.suricatesolutions.dingdong.model.TSipphone</class>
     <class>ch.suricatesolutions.dingdong.model.TTransfertNumber</class>
     <class>ch.suricatesolutions.dingdong.model.TDriveboxCore</class>
+    <class>ch.suricatesolutions.dingdong.model.TDriveboxHasOtherSoft</class>
+    <class>ch.suricatesolutions.dingdong.model.TDriveboxHasOtherSoftPK</class>
+    <class>ch.suricatesolutions.dingdong.model.TOtherSoft</class>
 	</persistence-unit>
 </persistence>

@@ -5,17 +5,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import ch.suricatesolutions.dingdong.business.MenuItem;
-import ch.suricatesolutions.dingdong.business.updates.UpdateManager;
-import ch.suricatesolutions.dingdong.updates.Update;
 
 @ManagedBean
 /**
@@ -27,18 +21,7 @@ public class MenuController {
 
 	private List<MenuItem> links = new ArrayList<MenuItem>();
 	
-//	@EJB
-//	private UpdateManager update;
-	
 	public MenuController(){
-//		try {
-//			Context c = new InitialContext();
-//			Update u =  (Update)(c.lookup("java:global/Interphones_management/UpdateManager"));
-//			u.getLatestCore();
-//		} catch (NamingException e) {
-//			e.printStackTrace();
-//		}
-		
 		ArrayList<String> admins = new ArrayList<String>();
 		admins.add(ADMINISTRATORS);
 		ArrayList<String> users = new ArrayList<String>();
@@ -50,6 +33,8 @@ public class MenuController {
 		links.add(new MenuItem("Accueil", "/pages/home.xhtml", all));
 		links.add(new MenuItem("Configuration Driveboxes", "/pages/user/listDrivebox.xhtml", users));
 		links.add(new MenuItem("Administration des Driveboxes", "", admins));
+		links.add(new MenuItem("Gérer les applications", "/pages/admin/appAdding.xhtml", admins));
+		links.add(new MenuItem("Test", "/pages/user/testDynAdd.xhtml", users));
 	}
 
 	public List<MenuItem> getLinks() {
