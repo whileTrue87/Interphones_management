@@ -19,33 +19,33 @@
 				<tr>
 					<th>Nom</th>
 					<td><h:inputText
-							binding="#{configDriveboxController.nameInput}" />
-					</td>
+							binding="#{configDriveboxController.nameInput}" /></td>
 				</tr>
 				<tr>
 					<th>Numéro de transfert</th>
 					<td><h:inputText
-							binding="#{configDriveboxController.numInput}" />
-					</td>
+							binding="#{configDriveboxController.numInput}" /></td>
 				</tr>
 				<tr>
 					<th>Muet</th>
 					<td><h:selectBooleanCheckbox
-							binding="#{configDriveboxController.muteInput}" /></td>
+							binding="#{configDriveboxController.muteInput}" />
+					</td>
 				</tr>
 				<tr>
 					<td><p:commandButton value="Sauver" title="Sauver"
 							actionListener="#{configDriveboxController.saveParams}"
-							ajax="true" id="updateButton" update="growl"/></td>
+							ajax="true" id="updateButton" update="growl" />
+					</td>
 				</tr>
 			</table>
-		</h:form>
-		<br />
-		<br />
-		<h:form id="updateForm">
+
+			<br />
+			<br />
+
 			<p:commandButton
 				actionListener="#{configDriveboxController.updateDrivebox}"
-				ajax="true" value="Mise à jour" update="growl"/>
+				ajax="true" value="Mise à jour" update="growl" />
 		</h:form>
 		<h:form prependId="false" id="dashboardForm">
 			<p:messages id="msgs" showDetail="false" />
@@ -217,6 +217,37 @@
 
 			</p:panel>
 		</h:form>
+		<br/>
+		<br/>
+		<h:form id="sipDeviceForm">
+		<p:commandButton
+				actionListener="#{configDriveboxController.updateSipDevices}"
+				ajax="true" value="Mise à jour" update="sipDeviceForm growl" />
+			<p:dataTable var="sipDevice"
+				value="#{configDriveboxController.sipDevices}" id="sipDevices"
+				emptyMessage="Vous n'avez actuellement aucun périphérique SIP">
 
+				<!-- Device's ID -->
+				<p:column filterBy="#{sipDevice.deviceId}" headerText="ID"
+					filterMatchMode="contains" filterStyle="width: 5em"
+					style="width: 20%">
+					<h:outputText value="#{sipDevice.deviceId}" />
+				</p:column>
+				
+				<!-- Device's type -->
+				<p:column filterBy="#{sipDevice.deviceType}" headerText="Type"
+					filterMatchMode="contains" filterStyle="width: 5em"
+					style="width: 20%">
+					<h:outputText value="#{sipDevice.deviceType}" />
+				</p:column>
+				
+				<!-- Device's ID -->
+				<p:column filterBy="#{sipDevice.deviceStatus}" headerText="Status"
+					filterMatchMode="exact" filterStyle="width: 5em"
+					style="width: 20%" filterOptions="#{configDriveboxController.deviceStatusOptions}">
+					<h:outputText value="#{sipDevice.deviceStatus}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
 	</ui:define>
 </ui:composition>

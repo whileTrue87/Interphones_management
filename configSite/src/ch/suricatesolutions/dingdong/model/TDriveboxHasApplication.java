@@ -15,7 +15,9 @@ import javax.persistence.*;
 @NamedQueries({
 		@NamedQuery(name = "TDriveboxHasApplication.installedAppsFromPkDrivebox", query = "SELECT a FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pk and a.enabled=true"),
 		@NamedQuery(name = "TDriveboxHasApplication.appFromPks", query = "SELECT a FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication"),
-		@NamedQuery(name = "TDriveboxHasApplication.countAppFromPks", query = "SELECT count(a) FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication") })
+		@NamedQuery(name = "TDriveboxHasApplication.countAppFromPks", query = "SELECT count(a) FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication"),
+		@NamedQuery(name = "TDriveboxHasApplication.appParam", query = "SELECT a.parameters FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication"),
+		@NamedQuery(name = "TDriveboxHasApplication.positionFromPk", query = "SELECT a.xPosition, a.yPosition FROM TDriveboxHasApplication a WHERE a.id.pfkDrivebox=:pkDrivebox and a.id.pfkApplication=:pkApplication") })
 @NamedNativeQueries({ @NamedNativeQuery(name = "TDriveboxHasApplication.insertNewOne", query = "INSERT INTO t_drivebox_has_application (pfk_drivebox, pfk_application, x_position, y_position, enabled, configuration_xml, last_modification) VALUES(?, ?, ?, ?, ?, ?, ?)") 
 })
 public class TDriveboxHasApplication implements Serializable {

@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.prime.com.tr/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	template="/templates/base.xhtml">
+
+	<ui:define name="title">Driveboxes</ui:define>
+	<ui:define name="menu"></ui:define>
+	<ui:define name="title_page">Driveboxes</ui:define>
+	<ui:define name="content">
+		<h:form id="allDriveboxes">
+			<p:dataTable var="drivebox" value="#{allDriveboxesController.driveboxesList}"
+				id="allDriveboxes"
+				emptyMessage="Il n'existe actuellement aucune Drivebox">
+
+				<!-- Drivebox's id-->
+				<p:column filterBy="#{drivebox.idDrivebox}" headerText="ID"
+					filterMatchMode="contains" filterStyle="width: 8em"
+					style="width: 25%">
+					<h:outputText value="#{drivebox.idDrivebox}" />
+				</p:column>
+				
+				<!-- Drivebox's IP address -->
+				<p:column filterBy="#{drivebox.ipAddress}" headerText="Adresse IP"
+					filterMatchMode="contains" filterStyle="width: 8em"
+					style="width: 25%">
+					<h:outputText value="#{drivebox.ipAddress}" />
+				</p:column>
+				
+				<!-- Client's name -->
+				<p:column filterBy="#{drivebox.TClient.name}" headerText="Nom"
+					filterMatchMode="contains" filterStyle="width: 8em"
+					style="width: 25%">
+					<h:outputText value="#{drivebox.TClient.name}" />
+				</p:column>
+				
+				<!-- Client's firstname -->
+				<p:column filterBy="#{drivebox.TClient.firstname}" headerText="Prénom"
+					filterMatchMode="contains" filterStyle="width: 8em"
+					style="width: 25%">
+					<h:outputText value="#{drivebox.TClient.firstname}" />
+				</p:column>
+			</p:dataTable>
+		</h:form>
+
+	</ui:define>
+</ui:composition>

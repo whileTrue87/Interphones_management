@@ -2,14 +2,25 @@ package ch.suricatesolutions.dingdong.business;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.faces.FacesException;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -28,47 +39,57 @@ import ch.suricatesolutions.dingdong.model.TDriveboxHasApplication;
  */
 public class XmlManager {
 
+	private static int cpt = 0;
+
 	/**
 	 * Checks if the given (x:y) position is in the givent xml file
-	 * @param xml The xml file to check in
-	 * @param x The x coordinate of the position
-	 * @param y The y coordinate of the position
+	 * 
+	 * @param xml
+	 *            The xml file to check in
+	 * @param x
+	 *            The x coordinate of the position
+	 * @param y
+	 *            The y coordinate of the position
 	 * @return True if (x:y) is in the xml file
 	 * @throws JDOMException
 	 * @throws IOException
 	 */
-//	public boolean isAtPosition(byte[] xml, int x, int y) throws JDOMException, IOException {
-//		if(xml == null)
-//			return false;
-//		SAXBuilder sxb = new SAXBuilder();
-//		Document doc = null;
-//		doc = sxb.build(new ByteArrayInputStream(xml));
-//		Element root = doc.getRootElement();
-//		XPath xpa = XPath.newInstance("/application/x_position");
-//		Element eXPos = (Element) xpa.selectSingleNode(root);
-//		if(eXPos == null)
-//			return false;
-//		boolean present = Integer.parseInt(eXPos.getText())==x;
-//		xpa = XPath.newInstance("/application/y_position");
-//		Element eYPos = (Element) xpa.selectSingleNode(root);
-//		if(eYPos == null)
-//			return false;
-//		present &= Integer.parseInt(eYPos.getText())==y;
-//		return present;
-//	}
+	// public boolean isAtPosition(byte[] xml, int x, int y) throws
+	// JDOMException, IOException {
+	// if(xml == null)
+	// return false;
+	// SAXBuilder sxb = new SAXBuilder();
+	// Document doc = null;
+	// doc = sxb.build(new ByteArrayInputStream(xml));
+	// Element root = doc.getRootElement();
+	// XPath xpa = XPath.newInstance("/application/x_position");
+	// Element eXPos = (Element) xpa.selectSingleNode(root);
+	// if(eXPos == null)
+	// return false;
+	// boolean present = Integer.parseInt(eXPos.getText())==x;
+	// xpa = XPath.newInstance("/application/y_position");
+	// Element eYPos = (Element) xpa.selectSingleNode(root);
+	// if(eYPos == null)
+	// return false;
+	// present &= Integer.parseInt(eYPos.getText())==y;
+	// return present;
+	// }
 
 	/**
 	 * Update the given configuration file with the (x:y) coordinates
-	 * @param configurationFile The configuration file to update
-	 * @param xPos The x coordinate
-	 * @param yPos The y coordinate
+	 * 
+	 * @param configurationFile
+	 *            The configuration file to update
+	 * @param xPos
+	 *            The x coordinate
+	 * @param yPos
+	 *            The y coordinate
 	 * @return The updated configuration file
 	 * @throws JDOMException
 	 * @throws IOException
 	 */
-	public byte[] updateConfigurationFile(byte[] configurationFile,
-			int xPos, int yPos) throws JDOMException, IOException {
-		if(configurationFile== null)
+	public byte[] updateConfigurationFile(byte[] configurationFile, int xPos, int yPos) throws JDOMException, IOException {
+		if (configurationFile == null)
 			return null;
 		SAXBuilder sxb = new SAXBuilder();
 		Document doc = null;
@@ -76,11 +97,11 @@ public class XmlManager {
 		Element root = doc.getRootElement();
 		XPath xpa = XPath.newInstance("/application/x_position");
 		Element eXPos = (Element) xpa.selectSingleNode(root);
-		if(eXPos != null)
+		if (eXPos != null)
 			eXPos.setText(String.valueOf(xPos));
 		xpa = XPath.newInstance("/application/y_position");
 		Element eYPos = (Element) xpa.selectSingleNode(root);
-		if(eYPos != null)
+		if (eYPos != null)
 			eYPos.setText(String.valueOf(yPos));
 		XMLOutputter xmlOut = new XMLOutputter();
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -90,41 +111,47 @@ public class XmlManager {
 	}
 
 	/**
-	 * Creates the dashboard configuration file from a list of installed applications configuration files
-	 * @param lastModification Last time the dashboard was edited
-	 * @param list The List containing all the applications configuration files
+	 * Creates the dashboard configuration file from a list of installed
+	 * applications configuration files
+	 * 
+	 * @param lastModification
+	 *            Last time the dashboard was edited
+	 * @param list
+	 *            The List containing all the applications configuration files
 	 * @return The generated xml configuration file
 	 * @throws JDOMException
 	 * @throws IOException
 	 */
-	public byte[] createXmlDashboardConfigurationFile(Date lastModification, List<TDriveboxHasApplication> list) throws JDOMException, IOException {
-		if(lastModification==null || list==null)
+	public byte[] createXmlDashboardConfigurationFile(Date lastModification, List<TDriveboxHasApplication> list)
+			throws JDOMException, IOException {
+		if (lastModification == null || list == null)
 			return null;
 		Element root = new Element("dashboard");
 		Element lastModif = new Element("lastModification");
 		DateFormat dfDate = new SimpleDateFormat("yyyy-MM-dd");
 		DateFormat dfHour = new SimpleDateFormat("HH:mm:ss");
-		lastModif.setText(dfDate.format(lastModification)+"T"+dfHour.format(lastModification));
+		lastModif.setText(dfDate.format(lastModification) + "T" + dfHour.format(lastModification));
 		Element apps = new Element("applications");
 		root.addContent(lastModif);
 		root.addContent(apps);
-		
-		for(TDriveboxHasApplication b : list){
+
+		for (TDriveboxHasApplication b : list) {
 			Element app = new Element("application");
-//			SAXBuilder sxb = new SAXBuilder();
-//			Document doc = null;
-//			doc = sxb.build(new ByteArrayInputStream(b));
-//			Element appRoot = doc.getRootElement();
-			
-			app.setAttribute("xPos",String.valueOf(b.getxPosition()));
-			app.setAttribute("yPos",String.valueOf(b.getyPosition()));
-			app.setAttribute("version",b.getTApplication().getVersion());
+			// SAXBuilder sxb = new SAXBuilder();
+			// Document doc = null;
+			// doc = sxb.build(new ByteArrayInputStream(b));
+			// Element appRoot = doc.getRootElement();
+
+			app.setAttribute("xPos", String.valueOf(b.getxPosition()));
+			app.setAttribute("yPos", String.valueOf(b.getyPosition()));
+			app.setAttribute("version", b.getTApplication().getVersion());
 			System.out.println(b.getTApplication().getVersion());
-			app.setAttribute("className",b.getTApplication().getId());
-			app.setAttribute("lastModification", dfDate.format(b.getLastModification())+"T"+dfHour.format(b.getLastModification()));
+			app.setAttribute("className", b.getTApplication().getId());
+			app.setAttribute("lastModification",
+					dfDate.format(b.getLastModification()) + "T" + dfHour.format(b.getLastModification()));
 			apps.addContent(app);
 		}
-		
+
 		Document doc = new Document();
 		doc.setRootElement(root);
 
@@ -148,7 +175,48 @@ public class XmlManager {
 		root.getChild("version").setText(dha.getTApplication().getVersion());
 		root.getChild("x_position").setText(String.valueOf(dha.getxPosition()));
 		root.getChild("y_position").setText(String.valueOf(dha.getyPosition()));
-		root.getChild("lastModification").setText( dfDate.format(dha.getLastModification())+"T"+dfHour.format(dha.getLastModification()));
+		root.getChild("lastModification").setText(
+				dfDate.format(dha.getLastModification()) + "T" + dfHour.format(dha.getLastModification()));
 		return config;
+	}
+
+	public byte[] updateZip(byte[] zipFile, byte[] newEntry, String fileName) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			ZipOutputStream zos = new ZipOutputStream(baos);
+			if (zipFile != null) {
+				File f = File.createTempFile("updateZip_", "_zip.zip");
+				FileOutputStream fosTmp = new FileOutputStream(f);
+				fosTmp.write(zipFile);
+				fosTmp.flush();
+				fosTmp.close();
+				ZipFile zf = new ZipFile(f);
+				Enumeration<? extends ZipEntry> entries = zf.entries();
+				while (entries.hasMoreElements()) {
+					ZipEntry ze = entries.nextElement();
+					ZipEntry ze2 = new ZipEntry(ze.getName());
+					zos.putNextEntry(ze2);
+					byte[] b = new byte[(int) ze.getSize()];
+					InputStream zis = zf.getInputStream(ze);
+					zis.read(b);
+					zos.write(b);
+					zos.flush();
+					zos.closeEntry();
+					zis.close();
+				}
+				zf.close();
+				f.delete();
+			}
+			ZipEntry ze = new ZipEntry(cpt++ + "_" + fileName);
+			zos.putNextEntry(ze);
+			zos.write(newEntry);
+			zos.flush();
+			zos.close();
+			baos.flush();
+			baos.close();
+		} catch (ZipException e) {
+			throw new FacesException(e.getMessage());
+		}
+		return baos.toByteArray();
 	}
 }

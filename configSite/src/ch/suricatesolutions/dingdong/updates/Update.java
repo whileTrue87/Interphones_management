@@ -1,5 +1,7 @@
 package ch.suricatesolutions.dingdong.updates;
 
+import java.util.List;
+
 import javax.ejb.Remote;
 
 
@@ -19,4 +21,6 @@ public interface Update{
 	public byte[] needAnotherUpdate(String driveboxId);
 	
 	public boolean updateDrivebox(int pkDrivebox) throws Exception;
+	
+	public List<SipDevice> getDeviceStatus(int pkDrivebox) throws Exception;
 }

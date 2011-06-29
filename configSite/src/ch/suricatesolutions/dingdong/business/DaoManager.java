@@ -26,6 +26,9 @@ public class DaoManager {
 
 	}
 
+	private static int staticCounter = 0;
+	private final int nBits = 4;
+
 	@PersistenceContext(unitName = "DingDong")
 	private EntityManager em;
 
@@ -345,8 +348,8 @@ public class DaoManager {
 		em.flush();
 		TDrivebox d = null;
 		try {
-			d = em.createNamedQuery("TDrivebox.getDriveboxFromPk", TDrivebox.class)
-					.setParameter("pkDrivebox", pkDrivebox).getSingleResult();
+			d = em.createNamedQuery("TDrivebox.getDriveboxFromPk", TDrivebox.class).setParameter("pkDrivebox", pkDrivebox)
+					.getSingleResult();
 		} catch (NoResultException e) {
 			System.err.println("Bad drivebox pk in getDriveboxFromPk : " + pkDrivebox);
 			return null;
@@ -357,10 +360,54 @@ public class DaoManager {
 	public boolean deleteApplication(int pkApplication) {
 		em.flush();
 		TApplication app = getApplicationFromPk(pkApplication);
-		if(app == null)
+		if (app == null)
 			return false;
 		em.remove(app);
 		em.flush();
 		return true;
+	}
+
+	public long getUnique() {
+		return (System.nanoTime() << nBits) | (staticCounter++ & 2 ^ nBits - 1);
+	}
+
+	public List<TDrivebox> getAllDriveboxes() {
+		em.flush();
+		return em.createNamedQuery("TDriveboxes.allDriveboxes", TDrivebox.class).getResultList();
+	}
+
+	public byte[] getAppParam(int pkDrivebox, int pkApplication) {
+		em.flush();
+		return em.createNamedQuery("TDriveboxHasApplication.appParam", byte[].class).setParameter("pkDrivebox", pkDrivebox)
+				.setParameter("pkApplication", pkApplication).getSingleResult();
+	}
+
+	public void updateAppParam(int pkDrivebox, int pkApplication, byte[] newZip) {
+		TDriveboxHasApplication dha = getInstalledAppFromPks(pkApplication, pkDrivebox);
+		if (dha != null) {
+			dha.setParameters(newZip);
+			em.persist(dha);
+		}
+	}
+
+	public int[] getAppPositionFromPk(int pkApplication, int pkDrivebox) {
+		em.flush();
+		int[] res = new int[2];
+		try {
+			Object[] resObject = em.createNamedQuery("TDriveboxHasApplication.positionFromPk", Object[].class).setParameter("pkApplication", pkApplication).setParameter("pkDrivebox", pkDrivebox)
+					.getSingleResult();
+			res[0] = (Integer)resObject[0];
+			res[1] = (Integer)resObject[1];
+		} catch (NoResultException e) {
+			return null;
+		}
+		return res;
+	}
+
+	public void clearParams(int pkDrivebox, int pkApplication) {
+		em.flush();
+		TDriveboxHasApplication dha = this.getInstalledAppFromPks(pkApplication, pkDrivebox);
+		dha.setParameters(null);
+		em.persist(dha);
 	}
 }
