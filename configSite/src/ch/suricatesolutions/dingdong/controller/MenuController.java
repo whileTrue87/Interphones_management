@@ -32,7 +32,7 @@ public class MenuController {
 		
 		links.add(new MenuItem("Accueil", "/pages/home.xhtml", all));
 		links.add(new MenuItem("Configuration Driveboxes", "/pages/user/listDrivebox.xhtml", users));
-		links.add(new MenuItem("Administration des Driveboxes", "", admins));
+		links.add(new MenuItem("Administration des Drivebox", "/pages/admin/allDriveboxes.xhtml", admins));
 		links.add(new MenuItem("Gérer les applications", "/pages/admin/appAdding.xhtml", admins));
 		links.add(new MenuItem("Test", "/pages/user/testDynAdd.xhtml", users));
 	}

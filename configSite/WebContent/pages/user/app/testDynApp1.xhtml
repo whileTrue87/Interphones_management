@@ -11,10 +11,12 @@
 
 	<ui:define name="app_name">Application 1</ui:define>
 	<ui:define name="param_content">
+				<p:messages showDetail="false"/>
+	
 		<h:outputLabel for="file" value="Fichier du contrat: " />
 			<p:fileUpload id="file" auto="true" multiple="true"
 				fileUploadListener="#{paramController.handleFileUpload}"
-				allowTypes="*.jpg;*.png;*.gif;" description="Photos" update="uploadInfo"/>
+				allowTypes="*.jpg;*.png;*.gif;" description="Photos" update="uploadInfo paramForm"/>
 			<p:message id="msgfile" for="file" />
 	</ui:define>
 </ui:composition>

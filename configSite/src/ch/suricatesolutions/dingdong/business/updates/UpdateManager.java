@@ -2,18 +2,20 @@ package ch.suricatesolutions.dingdong.business.updates;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.ejb.Stateless;
 import javax.faces.bean.ApplicationScoped;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.jdom.JDOMException;
 
@@ -23,6 +25,7 @@ import ch.suricatesolutions.dingdong.model.TApplication;
 import ch.suricatesolutions.dingdong.model.TDrivebox;
 import ch.suricatesolutions.dingdong.model.TDriveboxHasApplication;
 import ch.suricatesolutions.dingdong.updates.DriveboxInfo;
+import ch.suricatesolutions.dingdong.updates.SipDevice;
 import ch.suricatesolutions.dingdong.updates.Update;
 
 @Stateless
@@ -165,15 +168,67 @@ public class UpdateManager implements Update {
 	}
 
 	@Override
-	public boolean updateDrivebox(int pkDrivebox) throws Exception {
-		System.out.println("update drivebox " + pkDrivebox);
+	public boolean updateDrivebox(int pkDrivebox) {
+		System.out.println("update drivebox " + pkDrivebox); 
 		TDrivebox drivebox = dao.getDriveboxFromPk(pkDrivebox);
 		if (drivebox == null)
 			return false;
 		String ip = drivebox.getIpAddress();
+		System.out.println("IP address:" + ip);
 		DriveboxInfo di;
-		di = (DriveboxInfo) Naming.lookup("//" + ip + ":1099/Updater");
-		di.updateAvailable();
+		Properties props = new Properties();
+		props.setProperty("java.naming.factory.initial", "com.sun.jndi.rmi.registry.RegistryContextFactory");
+		props.setProperty(Context.PROVIDER_URL, "rmi://192.168.56.101:1099");
+		InitialContext ic;
+		try {
+			ic = new InitialContext(props);
+			di = (DriveboxInfo) ic.lookup("Updater");
+			di.updateAvailable();
+		} catch (NamingException e) {
+			e.printStackTrace();
+			return false;
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return false;
+		} catch (EJBException e){
+			e.printStackTrace();
+			return false;
+		}
 		return true;
+	}
+	
+	@Override
+	public List<SipDevice> getDeviceStatus(int pkDrivebox){
+//		System.out.println("update drivebox " + pkDrivebox); 
+		TDrivebox drivebox = dao.getDriveboxFromPk(pkDrivebox);
+		if (drivebox == null)
+			return null;
+		String ip = drivebox.getIpAddress();
+//		System.out.println("IP address:" + ip);
+		DriveboxInfo di;
+		Properties props = new Properties();
+		props.setProperty("java.naming.factory.initial", "com.sun.jndi.rmi.registry.RegistryContextFactory");
+		props.setProperty(Context.PROVIDER_URL, "rmi://"+ip+":1099");
+		InitialContext ic;
+		List<SipDevice> lSI = null;
+		try {
+			ic = new InitialContext(props);
+			di = (DriveboxInfo) ic.lookup("Updater");
+			lSI = di.getSipDevicesStatus();
+		} catch (NamingException e) {
+			e.printStackTrace();
+			return null;
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			return null;
+		} catch (EJBException e){
+			e.printStackTrace();
+			return null;
+		}
+		return lSI;
+	}
+
+	public long getUnique() {
+		return dao.getUnique();
 	}
 }

@@ -15,7 +15,8 @@ import java.util.List;
 @NamedQueries({ @NamedQuery(name = "TDrivebox.driveboxFromUser", query = "SELECT d FROM TDrivebox d JOIN d.TClient c WHERE c.login=:login"),
 	@NamedQuery(name = "TDrivebox.pkFromId", query = "SELECT d.pkDrivebox FROM TDrivebox d WHERE d.idDrivebox=:id"),
 	@NamedQuery(name = "TDrivebox.getDriveboxFromPk", query = "SELECT d FROM TDrivebox d WHERE d.pkDrivebox=:pkDrivebox"),	
-	@NamedQuery(name = "TDrivebox.lastDashboardModification", query = "SELECT d.lastDashboardModification FROM TDrivebox d WHERE d.idDrivebox=:id")	
+	@NamedQuery(name = "TDrivebox.lastDashboardModification", query = "SELECT d.lastDashboardModification FROM TDrivebox d WHERE d.idDrivebox=:id"),	
+	@NamedQuery(name = "TDriveboxes.allDriveboxes", query = "SELECT d FROM TDrivebox d")	
 })
 public class TDrivebox implements Serializable {
 	private static final long serialVersionUID = 1L;

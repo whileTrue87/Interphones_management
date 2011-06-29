@@ -21,13 +21,13 @@ public class TClient implements Serializable {
 
 	private String login;
 
-	private String nom;
+	private String name;
 
-	private int npa;
+	private int zip;
 
 	private String password;
 
-	private String prenom;
+	private String firstname;
 
 	//bi-directional many-to-one association to TDrivebox
 	@OneToMany(mappedBy="TClient")
@@ -52,20 +52,20 @@ public class TClient implements Serializable {
 		this.login = login;
 	}
 
-	public String getNom() {
-		return this.nom;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setNom(String nom) {
-		this.nom = nom;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public int getNpa() {
-		return this.npa;
+	public int getZip() {
+		return this.zip;
 	}
 
-	public void setNpa(int npa) {
-		this.npa = npa;
+	public void setZip(int zip) {
+		this.zip = zip;
 	}
 
 	public String getPassword() {
@@ -76,12 +76,12 @@ public class TClient implements Serializable {
 		this.password = password;
 	}
 
-	public String getPrenom() {
-		return this.prenom;
+	public String getFirstname() {
+		return this.firstname;
 	}
 
-	public void setPrenom(String prenom) {
-		this.prenom = prenom;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 
 	public List<TDrivebox> getTDriveboxs() {

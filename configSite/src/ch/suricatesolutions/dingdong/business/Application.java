@@ -1,7 +1,6 @@
 package ch.suricatesolutions.dingdong.business;
 
 import java.io.File;
-import java.util.List;
 
 
 public class Application implements ch.suricatesolutions.dingdong.applications.Application{

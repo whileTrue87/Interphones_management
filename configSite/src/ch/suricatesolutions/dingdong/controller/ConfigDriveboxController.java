@@ -23,7 +23,6 @@ import javax.faces.component.html.HtmlSelectBooleanCheckbox;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.primefaces.component.dialog.Dialog;
 import org.primefaces.component.dnd.Droppable;
@@ -36,6 +35,8 @@ import ch.suricatesolutions.dingdong.controller.app.ParamController;
 import ch.suricatesolutions.dingdong.model.TApplication;
 import ch.suricatesolutions.dingdong.model.TDrivebox;
 import ch.suricatesolutions.dingdong.model.TDriveboxHasApplication;
+import ch.suricatesolutions.dingdong.updates.DeviceStatus;
+import ch.suricatesolutions.dingdong.updates.SipDevice;
 import ch.suricatesolutions.dingdong.updates.Update;
 
 @ManagedBean
@@ -68,6 +69,7 @@ public class ConfigDriveboxController implements Serializable {
 	private Map<Point, List<Integer>> conflicts = new HashMap<Point, List<Integer>>();
 
 	private SelectItem[] booleanOptions = new SelectItem[3];
+	private SelectItem[] deviceStatusOptions;
 
 	private TDriveboxHasApplication app;
 
@@ -77,6 +79,7 @@ public class ConfigDriveboxController implements Serializable {
 	private HtmlSelectBooleanCheckbox muteInput;
 	private Dialog dialog;
 	private InputStream noApp;
+	private List<SipDevice> sipDevices;
 
 	public Dialog getDialog() {
 		return dialog;
@@ -91,6 +94,13 @@ public class ConfigDriveboxController implements Serializable {
 		booleanOptions[1] = new SelectItem(String.valueOf(true));
 		booleanOptions[2] = new SelectItem(String.valueOf(false));
 		noApp = new FileInputStream("C:\\noApp.png");
+		sipDevices = new ArrayList<SipDevice>();
+		DeviceStatus[] statuss = DeviceStatus.values();
+		deviceStatusOptions = new SelectItem[statuss.length + 1];
+		deviceStatusOptions[0] = new SelectItem("");
+		for (int i = 0; i < statuss.length; i++) {
+			deviceStatusOptions[i + 1] = new SelectItem(statuss[i].toString());
+		}
 	}
 
 	/**
@@ -128,11 +138,17 @@ public class ConfigDriveboxController implements Serializable {
 				return;
 			}
 		}
-		if (isInstalledApp(x, y)) {
-			dao.disableAppFromDrivebox(this.app.getId().getPfkApplication(), this.app.getId().getPfkDrivebox());
-		}
+		// if (isInstalledApp(x, y)) {
+		// dao.disableAppFromDrivebox(this.app.getId().getPfkApplication(),
+		// this.app.getId().getPfkDrivebox());
+		// }
 
 		notInstalledApp[x][y] = true;
+		int[] pos = dao.getAppPositionFromPk(app.getPkApplication(), this.pkDrivebox);
+		if (pos != null) {
+			System.out.println("Old position (" + x + ";" + y + ")");
+			notInstalledApp[pos[0]][pos[1]] = true;
+		}
 		dao.updateInstalledApp(app.getPkApplication(), this.pkDrivebox, x, y);
 
 	}
@@ -188,10 +204,12 @@ public class ConfigDriveboxController implements Serializable {
 	public String editDrivebox() {
 		Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		String idStr = params.get("id");
-		int pk = Integer.parseInt(idStr);
-		this.pkDrivebox = pk;
+		if (idStr != null) {
+			int pk = Integer.parseInt(idStr);
+			this.pkDrivebox = pk;
+		}
 		initializeInstalledApps();
-		return "driveboxConfig.xhtml";
+		return "/pages/user/driveboxConfig.xhtml";
 	}
 
 	/**
@@ -205,7 +223,9 @@ public class ConfigDriveboxController implements Serializable {
 	 * @return The link to the icon
 	 */
 	public StreamedContent installedAppIcon(int x, int y) {
+		// System.out.println("Installed app icon on ("+x+";"+y+")");
 		if (isInstalledApp(x, y)) {
+			// System.out.println("An icon is installed on ("+x+";"+y+")");
 			return new DefaultStreamedContent(new ByteArrayInputStream(app.getTApplication().getIcone()), "image/png");
 		}
 		try {
@@ -264,6 +284,7 @@ public class ConfigDriveboxController implements Serializable {
 	 * @return True if an icon has to be displayed
 	 */
 	public boolean iconHasToBeDisplayed(int x, int y) {
+		// System.out.println("Icon has to be displayed");
 		return !notInstalledApp[x][y];
 	}
 
@@ -306,30 +327,30 @@ public class ConfigDriveboxController implements Serializable {
 		muteInput.setValue(false);
 		dao.updateDrivebox(this.pkDrivebox, name, telNum, mute);
 		addMessage(new FacesMessage("Données mises à jour"));
-		// initializeInstalledApps();
 	}
 
 	public String updateParam(int pkApplication) {
 		TApplication app = dao.getApplicationFromPk(pkApplication);
 		String nextPage = app.getConfigurationLink();
 		ParamController param = (ParamController) getManagedBean("paramController");
-		// System.out.println(app.getBackBeanName());
-		param.setBackBeanName(app.getBackBeanName());
+		try {
+			param.setBackBean(app.getBackBeanName());
+		} catch (Exception e) {
+			addMessage(new FacesMessage("Une erreur est survenue au chargement de la page"));
+			e.printStackTrace();
+		}
 		param.setPkApplication(pkApplication);
 		param.setPkDrivebox(pkDrivebox);
-		// System.out.println("Next Page = " + nextPage);
 		return "app/" + nextPage;
 	}
 
 	public StreamedContent getAppIconStream() {// String id){
 		String pkStr = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pkApp");
-		// System.out.println("Id de l'application : " + pkStr);
 		if (pkStr == null || pkStr.equals(""))
 			return new DefaultStreamedContent(noApp);
 		int pk = Integer.parseInt(pkStr);
 
 		byte[] icon = dao.getApplicationFromPk(pk).getIcone();
-		// System.out.println(icon.length);
 		return new DefaultStreamedContent(new ByteArrayInputStream(icon), "image/png");
 	}
 
@@ -381,7 +402,7 @@ public class ConfigDriveboxController implements Serializable {
 
 	public void updateDrivebox() {
 		InitialContext ic;
-		System.out.println("update Drivebox");
+		// System.out.println("update Drivebox");
 		try {
 			ic = new InitialContext();
 			Update update = (Update) ic.lookup("java:global/Interphones_management/UpdateManager");
@@ -390,9 +411,42 @@ public class ConfigDriveboxController implements Serializable {
 				addMessage(new FacesMessage("La Drivebox a été avertie de la mise à jour"));
 			else
 				addMessage(new FacesMessage("La Drivebox n'a pas pu être contactée"));
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			addMessage(new FacesMessage("La Drivebox n'a pas pu être contactée"));
 			e.printStackTrace();
 		}
+	}
+
+	public void setSipDevices(List<SipDevice> sipDevices) {
+		this.sipDevices = sipDevices;
+	}
+
+	public List<SipDevice> getSipDevices() {
+		return sipDevices;
+	}
+
+	public void updateSipDevices() {
+		InitialContext ic;
+		// System.out.println("update Sip Devices");
+		try {
+			ic = new InitialContext();
+			Update update = (Update) ic.lookup("java:global/Interphones_management/UpdateManager");
+			List<SipDevice> lSD = update.getDeviceStatus(this.pkDrivebox);
+			if (lSD != null) {
+				this.setSipDevices(lSD);
+			} else
+				addMessage(new FacesMessage("La Drivebox n'a pas pu être contactée"));
+		} catch (Throwable e) {
+			addMessage(new FacesMessage("La Drivebox n'a pas pu être contactée"));
+			e.printStackTrace();
+		}
+	}
+
+	public void setDeviceStatusOptions(SelectItem[] deviceStatusOptions) {
+		this.deviceStatusOptions = deviceStatusOptions;
+	}
+
+	public SelectItem[] getDeviceStatusOptions() {
+		return deviceStatusOptions;
 	}
 }

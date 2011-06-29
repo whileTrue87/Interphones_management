@@ -13,8 +13,9 @@
 	<ui:define name="menu"></ui:define>
 	<ui:define name="title_page">Configuration des paramètres de l'application <ui:insert name="app_name"/></ui:define>
 	<ui:define name="content">
-		<h:form>
-			<p:commandButton onclick="javascript:history.go(-1)" value="Retour" />
+		<h:form id="paramForm">
+			<p:commandButton action="#{configDriveboxController.editDrivebox}" value="Retour" ajax="false"/>
+			<p:commandButton action="#{paramController.clearParams}" value="Réinitialiser les paramètres"  update="paramForm"/>
 			<br />
 			<br />
 			<ui:insert name="param_content"/>

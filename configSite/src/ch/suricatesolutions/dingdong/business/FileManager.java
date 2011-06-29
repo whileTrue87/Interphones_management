@@ -36,5 +36,4 @@ public class FileManager {
 		fos.write(page);
 		fos.close();
 	}
-	
 }
