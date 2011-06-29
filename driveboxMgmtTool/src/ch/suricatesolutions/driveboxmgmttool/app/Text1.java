@@ -1,10 +1,11 @@
 package ch.suricatesolutions.driveboxmgmttool.app;
 
 import java.io.File;
-import java.util.List;
+
+import ch.suricatesolutions.dingdong.applications.Application;
 
 
-public class Text1 implements ch.suricatesolutions.dingdong.applications.Application{
+public class Text1 implements Application{
 	private String name;
 	private String icone;
 	

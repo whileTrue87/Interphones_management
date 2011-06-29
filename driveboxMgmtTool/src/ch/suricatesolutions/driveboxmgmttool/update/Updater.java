@@ -68,9 +68,11 @@ public class Updater implements DriveboxInfo{
 		props.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
 		InitialContext ic;
 		for (int i = 0; i < MAX_CONNECT_TRIES; i++) {
+			System.out.println("Try nb "+i);
 			try {
 				ic = new InitialContext(props);
 				server = (Update) ic.lookup("java:global/Interphones_management/UpdateManager");
+				System.out.println("Connection made");
 				if (server != null)
 					break;
 			} catch (NamingException e) {
@@ -261,9 +263,10 @@ public class Updater implements DriveboxInfo{
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
+				System.out.println("send ip address");
 				URL url;
 				try {
-					url = new URL("http://localhost:8080/Interphones_management/IP.xhtml?driveboxId=" + drivebox_id);
+					url = new URL("http://192.168.56.1:8080/Interphones_management/IP.xhtml?driveboxId=" + drivebox_id);
 					url.openStream();
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
