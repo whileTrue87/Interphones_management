@@ -1,6 +1,6 @@
 package ch.suricatesolutions.driveboxmgmttool.app;
 
-import java.io.File;
+import javax.swing.JPanel;
 
 import ch.suricatesolutions.dingdong.applications.Application;
 
@@ -19,11 +19,12 @@ public class Text1 implements Application{
 		this.name = name;
 	}
 	public String getName() {
-		return name;
+		return "Text1";
 	}
 
 	@Override
-	public boolean launch() {
+	public boolean launch(JPanel appPanel) {
+		System.out.println("Application " + getName() + " launched");
 		return false;
 	}
 
@@ -38,12 +39,17 @@ public class Text1 implements Application{
 	}
 
 	@Override
-	public File getIcon() {
-		return null;
+	public String getIcon() {
+		return "appWriter.png";
 	}
 
 	@Override
 	public String getLastModification() {
 		return "2010-02-02T12:00:00";
+	}
+	@Override
+	public boolean close() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -20,23 +17,25 @@ import org.jdom.xpath.XPath;
 
 import ch.suricatesolutions.dingdong.applications.Application;
 import ch.suricatesolutions.driveboxmgmttool.core.Core;
+import ch.suricatesolutions.driveboxmgmttool.ihm.Dashboard;
 import ch.suricatesolutions.driveboxmgmttool.update.Updater;
 
 @SuppressWarnings("unchecked")
 public class ToolCore implements Core {
 
-	private static String dashboard_config_filename = "dashboard_config.xml";
+	public static String dashboard_config_filename = "dashboard_config.xml";
 
 	@Override
 	/**
 	 * Launchs the application
 	 */
 	public void launch() {
-		JFrame jf = new JFrame();
-		jf.getContentPane().add(new JLabel("coucou"));
-		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		jf.pack();
-		jf.setVisible(true);
+//		JFrame jf = new JFrame();
+//		jf.getContentPane().add(new JLabel("coucou"));
+//		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		jf.pack();
+//		jf.setVisible(true);
+		new Dashboard();
 	}
 
 	@Override

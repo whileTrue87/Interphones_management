@@ -6,7 +6,7 @@ import javax.swing.SwingUtilities;
 
 import ch.suricatesolutions.dingdong.applications.Application;
 
-public class Writer2 implements Application {
+public class Writer1 implements Application{
 
 	@Override
 	public boolean desinstall() {
@@ -23,23 +23,24 @@ public class Writer2 implements Application {
 		return null;
 	}
 
-	public String getName() {
-		return "Writer2";
-	}
-
 	@Override
 	public boolean launch(final JPanel appPanel) {
-		SwingUtilities.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable(){
 
 			@Override
 			public void run() {
-				appPanel.add(new JLabel("Writer 2"));
+				appPanel.add(new JLabel("Writer 1"));
 				appPanel.repaint();
 			}
-
+			
 		});
+		
 		System.out.println("Application " + getName() + " launched");
 		return true;
+	}
+	
+	public String getName(){
+		return "Writer1";
 	}
 
 	@Override
