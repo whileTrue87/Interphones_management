@@ -23,7 +23,7 @@ public class Writer2 implements Application {
 		return null;
 	}
 
-	public String getName() {
+	public String getTitle() {
 		return "Writer2";
 	}
 
@@ -38,7 +38,7 @@ public class Writer2 implements Application {
 			}
 
 		});
-		System.out.println("Application " + getName() + " launched");
+		System.out.println("Application " + getTitle() + " launched");
 		return true;
 	}
 

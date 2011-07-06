@@ -6,7 +6,6 @@ import ch.suricatesolutions.dingdong.applications.Application;
 
 
 public class Text1 implements Application{
-	private String name;
 	private String icone;
 	
 	public void setIcone(String icone) {
@@ -15,16 +14,13 @@ public class Text1 implements Application{
 	public String getIcone() {
 		return icone;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getName() {
+	public String getTitle() {
 		return "Text1";
 	}
 
 	@Override
 	public boolean launch(JPanel appPanel) {
-		System.out.println("Application " + getName() + " launched");
+		System.out.println("Application " + getTitle() + " launched");
 		return false;
 	}
 

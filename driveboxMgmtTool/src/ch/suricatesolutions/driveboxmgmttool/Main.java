@@ -4,6 +4,9 @@ import java.rmi.Naming;
 
 import ch.suricatesolutions.dingdong.updates.DriveboxInfo;
 import ch.suricatesolutions.driveboxmgmttool.core.Core;
+import ch.suricatesolutions.driveboxmgmttool.dao.Dao;
+import ch.suricatesolutions.driveboxmgmttool.dao.IDao;
+import ch.suricatesolutions.driveboxmgmttool.service.SipDeviceManager;
 import ch.suricatesolutions.driveboxmgmttool.update.DriveboxInfoUpdate;
 import ch.suricatesolutions.driveboxmgmttool.update.Updater;
 
@@ -23,7 +26,7 @@ public class Main {
 //		props.setProperty("java.naming.factory.state", "com.sun.corba.ee.impl.presentation.rmi.JNDIStateFactoryImpl");
 //		props.setProperty("org.omg.CORBA.ORBInitialHost", "confServer");
 //		props.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
-//		InitialContext ic;
+//		InitialContext ic;l
 //			try {
 //				System.out.println("trying to connect");
 //				ic = new InitialContext(props);

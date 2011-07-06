@@ -35,11 +35,11 @@ public class Writer1 implements Application{
 			
 		});
 		
-		System.out.println("Application " + getName() + " launched");
+		System.out.println("Application " + getTitle() + " launched");
 		return true;
 	}
 	
-	public String getName(){
+	public String getTitle(){
 		return "Writer1";
 	}
 

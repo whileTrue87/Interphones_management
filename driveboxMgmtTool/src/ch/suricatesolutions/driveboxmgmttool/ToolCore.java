@@ -117,7 +117,7 @@ public class ToolCore implements Core {
 						BeanApp ba = new BeanApp(Updater.getInstance().getServer().getApplication(id, Updater.drivebox_id));
 						oldJavaApp.updateParam(ba.getConfigFile(), ba.getParameters());
 					} else {
-						System.err.println("Application " + id + " don't need any update");
+						System.err.println("Application " + id + " doesn't need any update");
 					}
 				}
 			}

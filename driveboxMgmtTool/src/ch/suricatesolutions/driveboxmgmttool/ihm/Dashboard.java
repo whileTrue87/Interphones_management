@@ -14,6 +14,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
@@ -33,6 +34,7 @@ public class Dashboard extends JFrame implements IDashboard {
 	private JPanel dashPanel;
 	private JButton backButton;
 	private JPanel appPanel;
+	private JLabel lLeft;
 
 	public Application[][] getApps() {
 		return apps;
@@ -46,7 +48,6 @@ public class Dashboard extends JFrame implements IDashboard {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		BorderLayout bl = new BorderLayout();
 		getContentPane().setLayout(bl);
-
 		createInfoPanel();
 		getContentPane().add(infoPanel, BorderLayout.NORTH);
 		try {
@@ -96,28 +97,33 @@ public class Dashboard extends JFrame implements IDashboard {
 	}
 
 	@Override
-	public void setCrtApp(int i, int j) {
+	public void setCrtApp(Application app) {
 		displayBackButton();
-		crtApp = apps[i][j];
+		crtApp = app;
+		lLeft.setText(crtApp.getTitle());
 	}
 	
 	private void displayBackButton(){
 		if(backButton == null){
 			backButton = new JButton("Back");
+			backButton.setLocation(10, 30);
+			backButton.setSize(100, 40);
 			backButton.addActionListener(new ApplicationBackController(this));
 		}
-		infoPanel.add(backButton, BorderLayout.CENTER);
+		infoPanel.add(backButton);
 		infoPanel.repaint();
 	}
 
 	private JPanel createInfoPanel() {
 		infoPanel = new JPanel();
-		BorderLayout infoLayout = new BorderLayout();
-		infoLayout.setHgap(10);
-		infoPanel.setLayout(infoLayout);
+//		BorderLayout infoLayout = new BorderLayout();
+//		infoLayout.setHgap(10);
+//		GridLayout infoLayout = new GridLayout(1,3);
+//		infoPanel.setLayout(infoLayout);
+		infoPanel.setLayout(null);
 		infoPanel.setPreferredSize(new Dimension(infoPanel.getWidth(), 100));
 		infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-		JLabel lLeft = new JLabel("Drivebox");
+		lLeft = new JLabel("Drivebox");
 		lLeft.setFont(new Font("Arial", Font.BOLD, 32));
 		final JLabel lRight = new JLabel();
 		if (time != null)
@@ -135,8 +141,13 @@ public class Dashboard extends JFrame implements IDashboard {
 		time.setDelay(1000);
 		time.start();
 
-		infoPanel.add(lLeft, BorderLayout.WEST);
-		infoPanel.add(lRight, BorderLayout.EAST);
+		lLeft.setLocation(200, 0);
+		lLeft.setSize(1100, 100);
+		lLeft.setHorizontalAlignment(SwingConstants.CENTER);
+		infoPanel.add(lLeft);
+		lRight.setLocation(1300, 0);
+		lRight.setSize(200, 100);
+		infoPanel.add(lRight);
 		return infoPanel;
 	}
 
@@ -150,6 +161,7 @@ public class Dashboard extends JFrame implements IDashboard {
 		getContentPane().remove(appPanel);
 		repaint();
 		infoPanel.remove(backButton);
+		lLeft.setText("Drivebox");
 		repaint();
 		getContentPane().add(dashPanel, BorderLayout.CENTER);
 		repaint();
@@ -163,14 +175,5 @@ public class Dashboard extends JFrame implements IDashboard {
 		getContentPane().add(appPanel, BorderLayout.CENTER);
 		repaint();
 		return appPanel;
-	}
-
-	@Override
-	public void showSipDevices() {
-		JPanel p = getAppPanel();
-		crtApp = null;
-		displayBackButton();
-		p.add(new JLabel("SIP devices"));
-		repaint();
 	}
 }

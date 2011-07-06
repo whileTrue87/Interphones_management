@@ -5,7 +5,6 @@ import javax.swing.JPanel;
 
 
 public class Text2 implements ch.suricatesolutions.dingdong.applications.Application{
-	private String name;
 	private String icone;
 	
 	public void setIcone(String icone) {
@@ -14,16 +13,14 @@ public class Text2 implements ch.suricatesolutions.dingdong.applications.Applica
 	public String getIcone() {
 		return icone;
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getName() {
+
+	public String getTitle() {
 		return "Text2";
 	}
 
 	@Override
 	public boolean launch(JPanel appPanel) {
-		System.out.println("Application " + getName() + " launched");
+		System.out.println("Application " + getTitle() + " launched");
 		return false;
 	}
 
