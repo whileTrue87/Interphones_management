@@ -271,7 +271,7 @@ public class Updater{
 				System.err.println("send ip address");
 				URL url;
 				try {
-					url = new URL("http://192.168.56.1:8080/Interphones_management/IP.xhtml?driveboxId=" + drivebox_id);
+					url = new URL("http://"+Updater.serverIP+":8080/Interphones_management/IP.xhtml?driveboxId=" + drivebox_id);
 					url.openStream();
 				} catch (MalformedURLException e) {
 					e.printStackTrace();

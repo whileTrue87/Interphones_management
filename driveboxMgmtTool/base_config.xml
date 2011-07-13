@@ -2,4 +2,6 @@
 <base>
 	<installPath>/usr/app</installPath>
 	<driveboxId>A843543</driveboxId>
+	<serverIP>160.98.61.148</serverIP>
+	<context>drivebox</context>
 </base>
