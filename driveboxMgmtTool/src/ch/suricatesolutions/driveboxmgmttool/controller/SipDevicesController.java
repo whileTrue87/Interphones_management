@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 
 import ch.suricatesolutions.driveboxmgmttool.app.SipDevices;
 import ch.suricatesolutions.driveboxmgmttool.ihm.IDashboard;
-import ch.suricatesolutions.driveboxmgmttool.service.SipDeviceManager;
 
 public class SipDevicesController implements ActionListener{
 	
@@ -16,6 +15,9 @@ public class SipDevicesController implements ActionListener{
 	}
 
 	@Override
+	/**
+	 * Launch the "SIP devices application" 
+	 */
 	public void actionPerformed(ActionEvent e) {
 		SipDevices sip = new SipDevices();
 		sip.launch(dashboard.getAppPanel());

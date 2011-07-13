@@ -1,6 +1,10 @@
 package ch.suricatesolutions.driveboxmgmttool.app;
 
+import java.awt.Color;
+
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 
 
@@ -19,9 +23,21 @@ public class Text2 implements ch.suricatesolutions.dingdong.applications.Applica
 	}
 
 	@Override
-	public boolean launch(JPanel appPanel) {
+	public boolean launch(final JPanel appPanel) {
+		SwingUtilities.invokeLater(new Runnable(){
+
+			@Override
+			public void run() {
+				JLabel label = new JLabel(Text2.this.getTitle());
+				label.setForeground(Color.WHITE);
+				appPanel.add(label);
+				appPanel.repaint();
+			}
+			
+		});
+		
 		System.out.println("Application " + getTitle() + " launched");
-		return false;
+		return true;
 	}
 
 	@Override

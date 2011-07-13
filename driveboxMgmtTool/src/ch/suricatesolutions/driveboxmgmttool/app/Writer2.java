@@ -1,5 +1,7 @@
 package ch.suricatesolutions.driveboxmgmttool.app;
 
+import java.awt.Color;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -29,15 +31,18 @@ public class Writer2 implements Application {
 
 	@Override
 	public boolean launch(final JPanel appPanel) {
-		SwingUtilities.invokeLater(new Runnable() {
+		SwingUtilities.invokeLater(new Runnable(){
 
 			@Override
 			public void run() {
-				appPanel.add(new JLabel("Writer 2"));
+				JLabel label = new JLabel(Writer2.this.getTitle());
+				label.setForeground(Color.WHITE);
+				appPanel.add(label);
 				appPanel.repaint();
 			}
-
+			
 		});
+		
 		System.out.println("Application " + getTitle() + " launched");
 		return true;
 	}

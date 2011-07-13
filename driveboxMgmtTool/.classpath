@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="/home/domi/glassfish3/glassfish/modules/gf-client-module.jar"/>
 	<classpathentry kind="lib" path="lib/asterisk-java-1.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.16-bin.jar"/>
+	<classpathentry kind="lib" path="lib/jl1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

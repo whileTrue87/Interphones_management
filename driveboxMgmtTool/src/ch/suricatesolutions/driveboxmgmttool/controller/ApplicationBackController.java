@@ -13,6 +13,9 @@ public class ApplicationBackController implements ActionListener{
 	}
 
 	@Override
+	/**
+	 * Close the current application and display the dashboard
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if(dashboard.getCrtApp() != null)
 			dashboard.getCrtApp().close();

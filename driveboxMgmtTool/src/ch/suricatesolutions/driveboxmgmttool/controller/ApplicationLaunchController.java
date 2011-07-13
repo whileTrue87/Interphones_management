@@ -14,6 +14,10 @@ public class ApplicationLaunchController implements ActionListener {
 	}
 
 	@Override
+	/**
+	 * Get the action command of the button and launch the
+	 * corresponding application
+	 */
 	public void actionPerformed(ActionEvent e) {
 		String aC = e.getActionCommand();
 		String[] tok = aC.split("_");

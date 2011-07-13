@@ -21,37 +21,39 @@ import org.asteriskjava.manager.response.ManagerResponse;
 import ch.suricatesolutions.dingdong.updates.DeviceStatus;
 import ch.suricatesolutions.dingdong.updates.SipDevice;
 import ch.suricatesolutions.driveboxmgmttool.dao.Dao;
-import ch.suricatesolutions.driveboxmgmttool.dao.IDao;
 
-public class SipDeviceManager implements ManagerEventListener {
+/**
+ * Handle all the SIP interactions with Asterisk 
+ * @author Maxime Reymond
+ *
+ */
+public class AsteriskManager implements ManagerEventListener {
 	private List<SipDevice> lDevice;
-	private static SipDeviceManager instance;
+	private static AsteriskManager instance;
+	ManagerConnectionFactory factory = new ManagerConnectionFactory(
+			"localhost", "manager", "dingdong");
+	ManagerConnection managerConnection = factory.createManagerConnection();
 	
-	private SipDeviceManager(){
+	private AsteriskManager(){
 	}
 	
-	public static SipDeviceManager getInstance(){
+	public static AsteriskManager getInstance(){
 		if(instance == null){
-			instance = new SipDeviceManager();
+			instance = new AsteriskManager();
 		}
 		return instance;
 	}
 
+	/**
+	 * Get all the peers from Asterisk
+	 * @return A List containing all the peers with their status
+	 */
 	public List<SipDevice> getDeviceStatus() {
 		lDevice = new ArrayList<SipDevice>();
-		ManagerConnectionFactory factory = new ManagerConnectionFactory(
-				"localhost", "manager", "dingdong");
-		ManagerConnection managerConnection = factory.createManagerConnection();
+		
 		ManagerResponse originateResponse;
 		SipPeersAction originateAction = new SipPeersAction();
 		managerConnection.addEventListener(this);
-		// OriginateAction originateAction;
-		// originateAction = new OriginateAction();
-		// originateAction.setChannel("SIP/sip.idefisk");
-		// originateAction.setContext("asterisk_test");
-		// originateAction.setExten("1001");
-		// originateAction.setPriority(new Integer(1));
-		// originateAction.setTimeout(new Integer(30000));
 		try {
 			managerConnection.login();
 			originateResponse = managerConnection.sendAction(originateAction,
@@ -90,9 +92,9 @@ public class SipDeviceManager implements ManagerEventListener {
 				return;
 			SipDevice sip = new SipDevice(peerEvent.getObjectName(), "",
 					DeviceStatus.ON,id);
-			System.out.println("status="+peerEvent.getStatus());
+//			System.out.println("status="+peerEvent.getStatus());
 			if (peerEvent.getStatus() == null) {
-				sip.setDeviceStatus(DeviceStatus.NOT_COUPLED);
+				sip.setDeviceStatus(DeviceStatus.NOT_REGISTRED);
 				InetAddress inet;
 				try {
 					inet = InetAddress.getByName(peerEvent.getIpAddress());
@@ -114,12 +116,13 @@ public class SipDeviceManager implements ManagerEventListener {
 		}
 	}
 
+	/**
+	 * Reload the sip parameters of Asterik and send a notify to the given peers
+	 * @param peers The peers to be notified
+	 */
 	public void reloadPeers(String[] peers) {
 		AgiAction aa = new AgiAction();
 		aa.setActionId("sip reload");
-		ManagerConnectionFactory factory = new ManagerConnectionFactory(
-				"localhost", "manager", "dingdong");
-		ManagerConnection managerConnection = factory.createManagerConnection();
 		try {
 			managerConnection.login();
 			managerConnection.sendAction(aa, 30000);

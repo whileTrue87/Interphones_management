@@ -1,5 +1,7 @@
 package ch.suricatesolutions.driveboxmgmttool.app;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -16,9 +18,13 @@ import ch.suricatesolutions.dingdong.applications.Application;
 import ch.suricatesolutions.dingdong.updates.DeviceStatus;
 import ch.suricatesolutions.dingdong.updates.SipDevice;
 import ch.suricatesolutions.driveboxmgmttool.dao.Dao;
-import ch.suricatesolutions.driveboxmgmttool.service.SipDeviceManager;
+import ch.suricatesolutions.driveboxmgmttool.service.AsteriskManager;
 
-
+/**
+ * Display a table of SIP devices
+ * @author Maxime Reymond
+ *
+ */
 public class SipDevices implements Application {
 	private JTable jt;
 	private JScrollPane js;
@@ -50,6 +56,10 @@ public class SipDevices implements Application {
 
 	@Override
 	public boolean launch(final JPanel panel) {
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setForeground(Color.WHITE);
+		buttonPanel.setBackground(Color.BLACK);
+		panel.setLayout(new BorderLayout());
 		
 		reloadTable(panel);
 		
@@ -62,8 +72,8 @@ public class SipDevices implements Application {
 			}
 			
 		});
-		panel.add(softUpdate);
-		panel.repaint();
+		buttonPanel.add(softUpdate);
+		buttonPanel.repaint();
 		
 		JButton hardUpdate = new JButton("hard update");
 		hardUpdate.addActionListener(new ActionListener(){
@@ -71,7 +81,7 @@ public class SipDevices implements Application {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					SipDeviceManager.getInstance().reloadPeers(Dao.getInstance().getAllPeersName());
+					AsteriskManager.getInstance().reloadPeers(Dao.getInstance().getAllPeersName());
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -79,13 +89,18 @@ public class SipDevices implements Application {
 			}
 			
 		});
-		panel.add(hardUpdate);
+		buttonPanel.add(hardUpdate);
+		buttonPanel.repaint();
+		
+		panel.add(buttonPanel, BorderLayout.NORTH);
 		panel.repaint();
-		//bouton refresh soft --> SipDeviceManager.getInstance().getDeviceStatus() ... comme en haut de la méthode
-		//bouton refresh hard --> SipDeviceManager.getInstance().reloadPeers
 		return true;
 	}
 	
+	/**
+	 * Reload the table of SIP devices and display it on the given Panel
+	 * @param panel The panel on which display the information
+	 */
 	public void reloadTable(JPanel panel){
 		List<SipDevice> lds = getSipDevices();
 		final String[] header = new String[]{"Name", "Type", "Status"};
@@ -102,8 +117,10 @@ public class SipDevices implements Application {
 		}
 		createTable(content, header);
 		js = new JScrollPane(jt);
+		js.setBackground(Color.BLACK);
+		js.getViewport().setBackground(Color.BLACK);
 		js.setPreferredSize(new Dimension(500, jt.getRowCount()*ROW_HEIGHT+53));
-		panel.add(js);
+		panel.add(js, BorderLayout.CENTER);
 		panel.repaint();
 	}
 	
@@ -113,8 +130,16 @@ public class SipDevices implements Application {
 		return true;
 	}
 	
+	/**
+	 * Create a new table of SIP devices with the given content and header
+	 * @param content The content of the table
+	 * @param header The header of the table
+	 */
 	public void createTable(String[][] content, String[] header){
 		jt = new JTable(content, header);
+		jt.setBackground(new Color(220,220,220));
+		jt.setForeground(Color.BLACK);
+		jt.getTableHeader().setBackground(new Color (205, 235, 255));
 		jt.setRowHeight(ROW_HEIGHT);
 		jt.setFont(new Font("Arial", Font.PLAIN, 20));
 		jt.getTableHeader().setFont(new Font("Arial", Font.PLAIN, 20));
@@ -122,8 +147,12 @@ public class SipDevices implements Application {
 		jt.setEnabled(false);
 	}
 	
+	/**
+	 * Get all the sip devices from asterisk
+	 * @return A List containing all the SIP devices
+	 */
 	public List<SipDevice> getSipDevices(){
-		List<SipDevice> lds = SipDeviceManager.getInstance().getDeviceStatus();
+		List<SipDevice> lds = AsteriskManager.getInstance().getDeviceStatus();
 		if(lds == null)
 			lds = new ArrayList<SipDevice>();
 		try {

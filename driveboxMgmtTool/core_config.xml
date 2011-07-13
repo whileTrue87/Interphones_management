@@ -3,4 +3,6 @@
 	<version>1.0.0.2</version>
 	<mainClass>ch.suricatesolutions.driveboxmgmttool.ToolCore</mainClass>
 	<installPath>/usr/app</installPath>
+	<serverIP>192.168.56.1</serverIP>
+	<context>idefisk_test</context>
 </core>

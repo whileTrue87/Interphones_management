@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.RemoteException;
-import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,12 +24,10 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
-import ch.suricatesolutions.dingdong.updates.DriveboxInfo;
-import ch.suricatesolutions.dingdong.updates.SipDevice;
 import ch.suricatesolutions.dingdong.updates.Update;
 import ch.suricatesolutions.driveboxmgmttool.core.Core;
 
-public class Updater implements DriveboxInfo{
+public class Updater{
 	private static final long serialVersionUID = -1500777673140019426L;
 	private static final int MAX_CONNECT_TRIES = 3;
 	private static String core_config_filename = "core_config.xml";
@@ -39,6 +35,8 @@ public class Updater implements DriveboxInfo{
 	public final static String app_install_path = "app/";
 	private static Updater instance;
 	private Update server;
+	private static String serverIP;
+	public static String context;
 
 	static {
 		File base_config = new File("base_config.xml");
@@ -52,6 +50,12 @@ public class Updater implements DriveboxInfo{
 				Element driveboxId = root.getChild("driveboxId");
 				if(driveboxId != null)
 				drivebox_id = driveboxId.getText();
+				Element serverIP = root.getChild("serverIP");
+				if(serverIP != null)
+					Updater.serverIP = serverIP.getText();
+				Element context = root.getChild("context");
+				if(context != null)
+					Updater.context = context.getText();
 			} catch (JDOMException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -65,7 +69,7 @@ public class Updater implements DriveboxInfo{
 		props.setProperty("java.naming.factory.initial", "com.sun.enterprise.naming.SerialInitContextFactory");
 		props.setProperty("java.naming.factory.url.pkgs", "com.sun.enterprise.naming");
 		props.setProperty("java.naming.factory.state", "com.sun.corba.ee.impl.presentation.rmi.JNDIStateFactoryImpl");
-		props.setProperty("org.omg.CORBA.ORBInitialHost", "192.168.56.1");
+		props.setProperty("org.omg.CORBA.ORBInitialHost", Updater.serverIP);
 		props.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
 		InitialContext ic;
 		for (int i = 0; i < MAX_CONNECT_TRIES; i++) {
@@ -99,10 +103,6 @@ public class Updater implements DriveboxInfo{
 	 * @throws Exception
 	 */
 	public Core update() throws Exception {
-//		Class<?> coreCls = Class.forName("ch.suricatesolutions.driveboxmgmttool.ToolCore");
-//		Constructor<?> construct = coreCls.getConstructor();
-//		Core core = (Core) construct.newInstance();
-//		return core;
 		if(server == null)
 			return null;
 //		 ----------------- Environnement updates ---------------------
@@ -259,6 +259,10 @@ public class Updater implements DriveboxInfo{
 		return proc;
 	}
 
+	/**
+	 * Timer that sent to the server the new IP address of the Drivebox 
+	 * @throws IOException
+	 */
 	public void updateIpAddress() throws IOException {
 		Timer timer = new Timer();
 		TimerTask task = new TimerTask() {
@@ -277,24 +281,5 @@ public class Updater implements DriveboxInfo{
 			}
 		};
 		timer.schedule(task, 0, 300000);
-	}
-
-	@Override
-	public void updateAvailable() {
-	}
-
-	@Override
-	public List<SipDevice> getSipDevicesStatus() {
-		return null;
-	}
-
-	@Override
-	public boolean addSipDevice(SipDevice arg0) {
-		return false;
-	}
-
-	@Override
-	public boolean deleteSipDevice(int arg0) throws RemoteException {
-		return false;
 	}
 }

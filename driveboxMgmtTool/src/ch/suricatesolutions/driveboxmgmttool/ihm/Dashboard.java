@@ -1,6 +1,8 @@
 package ch.suricatesolutions.driveboxmgmttool.ihm;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -9,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -43,7 +46,7 @@ public class Dashboard extends JFrame implements IDashboard {
 	private ConfigFileManager file;
 
 	public Dashboard() {
-		setSize(1500, 650);
+		setSize(1500, 950);
 		setTitle("Drivebox Management Tool");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		BorderLayout bl = new BorderLayout();
@@ -59,7 +62,7 @@ public class Dashboard extends JFrame implements IDashboard {
 	}
 
 	private void createDashboard(String location) throws Exception {
-		file = new ConfigFileManager();
+		file = ConfigFileManager.getInstance();
 		apps = file.getAllApplications();
 		if (apps == null)
 			return;
@@ -70,19 +73,35 @@ public class Dashboard extends JFrame implements IDashboard {
 		JPanel gridPanel = new JPanel();
 		GridLayout gl = new GridLayout(apps.length, apps[0].length);
 		gridPanel.setLayout(gl);
+		gridPanel.setBackground(Color.BLACK);
+		gridPanel.setForeground(Color.WHITE);
 		ApplicationLaunchController ac = new ApplicationLaunchController(this);
 		for (int i = 0; i < apps.length; i++) {
 			for (int j = 0; j < apps[i].length; j++) {
 				Application app = apps[i][j];
+				JPanel appPanel = new JPanel();
+				BoxLayout b = new BoxLayout(appPanel, BoxLayout.Y_AXIS);
+				appPanel.setLayout(b);
+				appPanel.setBackground(Color.BLACK);
+				appPanel.setForeground(Color.WHITE);
+				
 				if (app == null) {
-					gridPanel.add(new JButton());
+					gridPanel.add(appPanel);
 					continue;
 				}
 				ImageIcon ii = new ImageIcon(app.getIcon());
 				JButton jb = new JButton(ii);
+				jb.setAlignmentX(Component.CENTER_ALIGNMENT);
+				jb.setBackground(Color.BLACK);
+				jb.setBorderPainted(false);
+				appPanel.add(jb);
+				JLabel labApp = new JLabel(app.getTitle());
+				labApp.setAlignmentX(Component.CENTER_ALIGNMENT);
+				labApp.setForeground(Color.WHITE);
+				appPanel.add(labApp);
 				jb.setActionCommand(i + "_" + j);
 				jb.addActionListener(ac);
-				gridPanel.add(jb);
+				gridPanel.add(appPanel);
 			}
 		}
 		dashPanel.add(gridPanel, BorderLayout.CENTER);
@@ -116,16 +135,16 @@ public class Dashboard extends JFrame implements IDashboard {
 
 	private JPanel createInfoPanel() {
 		infoPanel = new JPanel();
-//		BorderLayout infoLayout = new BorderLayout();
-//		infoLayout.setHgap(10);
-//		GridLayout infoLayout = new GridLayout(1,3);
-//		infoPanel.setLayout(infoLayout);
 		infoPanel.setLayout(null);
 		infoPanel.setPreferredSize(new Dimension(infoPanel.getWidth(), 100));
 		infoPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		infoPanel.setBackground(Color.BLACK);
+		infoPanel.setForeground(Color.WHITE);
 		lLeft = new JLabel("Drivebox");
 		lLeft.setFont(new Font("Arial", Font.BOLD, 32));
+		lLeft.setForeground(Color.WHITE);
 		final JLabel lRight = new JLabel();
+		lRight.setForeground(Color.WHITE);
 		if (time != null)
 			time.stop();
 		time = new Timer(0, new ActionListener() {
@@ -170,6 +189,8 @@ public class Dashboard extends JFrame implements IDashboard {
 	@Override
 	public JPanel getAppPanel() {
 		appPanel = new JPanel();
+		appPanel.setBackground(Color.BLACK);
+		appPanel.setForeground(Color.WHITE);
 		getContentPane().remove(dashPanel);
 		repaint();
 		getContentPane().add(appPanel, BorderLayout.CENTER);

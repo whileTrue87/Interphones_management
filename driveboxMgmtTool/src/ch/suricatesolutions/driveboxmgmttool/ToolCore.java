@@ -1,14 +1,17 @@
 package ch.suricatesolutions.driveboxmgmttool;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -30,11 +33,6 @@ public class ToolCore implements Core {
 	 * Launchs the application
 	 */
 	public void launch() {
-//		JFrame jf = new JFrame();
-//		jf.getContentPane().add(new JLabel("coucou"));
-//		jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		jf.pack();
-//		jf.setVisible(true);
 		new Dashboard();
 	}
 
@@ -51,9 +49,10 @@ public class ToolCore implements Core {
 	 * Updates the dashboard
 	 */
 	public void update() {
-		if(Updater.getInstance().getServer() == null)
+		if (Updater.getInstance().getServer() == null)
 			return;
-		byte[] dashboard_config = Updater.getInstance().getServer().getLatestDashboardConfiguration(Updater.drivebox_id);
+		byte[] dashboard_config = Updater.getInstance().getServer()
+				.getLatestDashboardConfiguration(Updater.drivebox_id);
 		if (dashboard_config == null)
 			return;
 		try {
@@ -63,7 +62,8 @@ public class ToolCore implements Core {
 					proc.waitFor();
 				}
 			}
-			FileOutputStream baos = new FileOutputStream(new File(dashboard_config_filename));
+			FileOutputStream baos = new FileOutputStream(new File(
+					dashboard_config_filename));
 			baos.write(dashboard_config);
 			baos.close();
 		} catch (Exception e) {
@@ -80,15 +80,18 @@ public class ToolCore implements Core {
 	private List<Process> checkUpdate() throws Exception {
 		File dashboard_config = new File(dashboard_config_filename);
 		List<Process> result = new ArrayList<Process>();
-		byte[] newConfig = Updater.getInstance().getServer().getLatestDashboardConfiguration(Updater.drivebox_id);
+		byte[] newConfig = Updater.getInstance().getServer()
+				.getLatestDashboardConfiguration(Updater.drivebox_id);
 		if (newConfig == null)
 			return null;
 		SAXBuilder sxb = new SAXBuilder();
-		ByteArrayInputStream baos_newConfig = new ByteArrayInputStream(newConfig);
+		ByteArrayInputStream baos_newConfig = new ByteArrayInputStream(
+				newConfig);
 		Document newDoc = sxb.build(baos_newConfig);
 		Element newRoot = newDoc.getRootElement();
 		if (dashboard_config.exists()) {
-			FileInputStream fis_oldConfig = new FileInputStream(dashboard_config);
+			FileInputStream fis_oldConfig = new FileInputStream(
+					dashboard_config);
 			Document oldDoc = sxb.build(fis_oldConfig);
 			Element oldRoot = oldDoc.getRootElement();
 			XPath xpa = XPath.newInstance("/dashboard/lastModification");
@@ -96,28 +99,39 @@ public class ToolCore implements Core {
 			List<Element> newApplications = xpa.selectNodes(newRoot);
 			for (Element newApp : newApplications) {
 				String id = newApp.getAttributeValue("className");
-				xpa = XPath.newInstance("/dashboard/applications/application[@className=\"" + id + "\"]");
+				xpa = XPath
+						.newInstance("/dashboard/applications/application[@className=\""
+								+ id + "\"]");
 				Element oldApp = (Element) xpa.selectSingleNode(oldRoot);
 				String newAppVersion = newApp.getAttributeValue("version");
 				if (oldApp == null) {
-					System.err.println("New application " + id + " v." + newAppVersion + " installed");
+					System.err.println("New application " + id + " v."
+							+ newAppVersion + " installed");
 					result.add(installApp(id));
 				} else {
-					String newLastModDate = newApp.getAttributeValue("lastModification");
-					String oldLastModDate = oldApp.getAttributeValue("lastModification");
+					String newLastModDate = newApp
+							.getAttributeValue("lastModification");
+					String oldLastModDate = oldApp
+							.getAttributeValue("lastModification");
 					Application oldJavaApp = getApplication(id);
 					String oldAppVersion = oldApp.getAttributeValue("version");
 					if (!oldAppVersion.equals(newAppVersion)) {
-						System.err.println("Application" + id + " Updated from version v." + oldAppVersion + " to version v."
-								+ newAppVersion);
+						System.err.println("Application" + id
+								+ " Updated from version v." + oldAppVersion
+								+ " to version v." + newAppVersion);
 						oldJavaApp.desinstall();
 						result.add(installApp(id));
 					} else if (!newLastModDate.equals(oldLastModDate)) {
-						System.err.println("Application" + id + " parameters updated");
-						BeanApp ba = new BeanApp(Updater.getInstance().getServer().getApplication(id, Updater.drivebox_id));
-						oldJavaApp.updateParam(ba.getConfigFile(), ba.getParameters());
+						System.err.println("Application" + id
+								+ " parameters updated");
+						BeanApp ba = new BeanApp(Updater.getInstance()
+								.getServer()
+								.getApplication(id, Updater.drivebox_id));
+						oldJavaApp.updateParam(ba.getConfigFile(),
+								ba.getParameters());
 					} else {
-						System.err.println("Application " + id + " doesn't need any update");
+						System.err.println("Application " + id
+								+ " doesn't need any update");
 					}
 				}
 			}
@@ -128,7 +142,9 @@ public class ToolCore implements Core {
 			List<Element> oldApplications = xpa.selectNodes(oldRoot);
 			for (Element oldApp : oldApplications) {
 				String id = oldApp.getAttributeValue("className");
-				xpa = XPath.newInstance("/dashboard/applications/application[@className=\"" + id + "\"]");
+				xpa = XPath
+						.newInstance("/dashboard/applications/application[@className=\""
+								+ id + "\"]");
 				Element newApp = (Element) xpa.selectSingleNode(newRoot);
 				if (newApp == null) {
 					System.err.println("Desinstallation of application " + id);
@@ -139,7 +155,8 @@ public class ToolCore implements Core {
 			}
 			fis_oldConfig.close();
 		} else {
-			System.err.println("No dashboard configuration file found --> installation of all applications");
+			System.err
+					.println("No dashboard configuration file found --> installation of all applications");
 			result.addAll(installAllApps(newRoot));
 		}
 		baos_newConfig.close();
@@ -159,7 +176,8 @@ public class ToolCore implements Core {
 		List<Element> newApplications = xpa.selectNodes(root);
 		List<Process> lProc = new ArrayList<Process>();
 		for (Element newApp : newApplications) {
-			System.err.println("New application " + newApp.getAttributeValue("className") + " v."
+			System.err.println("New application "
+					+ newApp.getAttributeValue("className") + " v."
 					+ newApp.getAttributeValue("version") + " installed");
 			lProc.add(installApp(newApp.getAttributeValue("className")));
 		}
@@ -190,14 +208,15 @@ public class ToolCore implements Core {
 	 * @throws Exception
 	 */
 	private Process installApp(String appId) throws Exception {
-		byte[] app = Updater.getInstance().getServer().getApplication(appId, Updater.drivebox_id);
+		byte[] app = Updater.getInstance().getServer()
+				.getApplication(appId, Updater.drivebox_id);
 		BeanApp ba = new BeanApp(app);
 
 		String tempDir = "temp/app/" + System.currentTimeMillis() + "/";
 		File tempDirF = new File(tempDir);
 		if (!tempDirF.exists())
 			tempDirF.mkdirs();
-
+		// new FileOutputStream(tempDir+"asfd.zip").write(app);
 		String appName = tempDir + "application.jar";
 		String confFilename = tempDir + "configuration.xml";
 		String paramFilename = tempDir + "parameters.zip";
@@ -207,19 +226,31 @@ public class ToolCore implements Core {
 
 		FileOutputStream baos = new FileOutputStream(appFile);
 		baos.write(ba.getAppJar());
+		baos.flush();
 		baos.close();
+
 		baos = new FileOutputStream(configFile);
 		baos.write(ba.getConfigFile());
+		baos.flush();
 		baos.close();
+
 		if (ba.getParameters() != null) {
 			baos = new FileOutputStream(paramFile);
 			baos.write(ba.getParameters());
+			baos.flush();
 			baos.close();
 		}
 
-		String cmd = "java -jar " + appName + " " + Updater.app_install_path + " " + confFilename
+		String cmd = "java -jar " + appName + " " + confFilename
 				+ (ba.getParameters() == null ? "" : (" " + paramFilename));
+		System.out.println(cmd);
 		Process proc = Runtime.getRuntime().exec(cmd);
+//		BufferedReader bis = new BufferedReader(new InputStreamReader(
+//				proc.getErrorStream()));
+//		String line = null;
+//		while ((line = bis.readLine()) != null) {
+//			System.err.println(line);
+//		}
 		proc.waitFor();
 		appFile.delete();
 		paramFile.delete();
@@ -229,6 +260,12 @@ public class ToolCore implements Core {
 	}
 }
 
+/**
+ * This class represents an Application created with the JAR file
+ * 
+ * @author Maxime Reymond
+ * 
+ */
 class BeanApp {
 	private byte[] appJar;
 	private byte[] configFile;
@@ -242,30 +279,40 @@ class BeanApp {
 		if (!tempDirF.exists())
 			tempDirF.mkdirs();
 
-		String tempJar = tempDir + "tempApp" + System.currentTimeMillis() + ".jar";
+		String tempJar = tempDir + "tempApp" + System.currentTimeMillis()
+				+ ".jar";
 		File tempJarF = new File(tempJar);
 		FileOutputStream fos = new FileOutputStream(tempJarF);
 		fos.write(completeJar);
+		fos.flush();
 		fos.close();
 
-		JarFile jf = new JarFile(tempJar);
+		ZipFile jf = new ZipFile(tempJar);
 
-		JarEntry applicationJar = jf.getJarEntry("application.jar");
-		appJar = new byte[(int) applicationJar.getSize()];
-		jf.getInputStream(applicationJar).read(appJar);
+		appJar = getEntry(jf, "application.jar");
+		configFile = getEntry(jf, "configuration.xml");
+		parameters = getEntry(jf, "parameters.zip");
 
-		JarEntry configurationXml = jf.getJarEntry("configuration.xml");
-		configFile = new byte[(int) configurationXml.getSize()];
-		jf.getInputStream(configurationXml).read(configFile);
-
-		JarEntry parametersZip = jf.getJarEntry("parameters.zip");
-		if (parametersZip != null) {
-			parameters = new byte[(int) parametersZip.getSize()];
-			jf.getInputStream(parametersZip).read(parameters);
-		}
 		jf.close();
 		tempJarF.delete();
 		tempDirF.delete();
+	}
+
+	private byte[] getEntry(ZipFile jf, String entryName) throws IOException {
+		ZipEntry entry = jf.getEntry(entryName);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		if (entry != null) {
+			byte[] appJarTemp = new byte[1000];
+			InputStream is = jf.getInputStream(entry);
+			int nread = 0;
+			while ((nread = is.read(appJarTemp)) > 0) {
+				baos.write(appJarTemp, 0, nread);
+			}
+			is.close();
+			baos.close();
+			return baos.toByteArray();
+		}
+		return null;
 	}
 
 	public byte[] getAppJar() {
