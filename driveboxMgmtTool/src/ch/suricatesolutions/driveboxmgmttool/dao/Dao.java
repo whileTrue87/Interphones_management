@@ -140,12 +140,12 @@ public class Dao implements IDao {
 			if(rs.next())
 				cnt = rs.getInt("tot");
 			if(cnt==0){
-				String insertRedirect = "insert into extensions_table values (3,'idefisk_test',1002,1,'Dial','"+number+"')";
+				String insertRedirect = "insert into extensions_table values (3,'idefisk_test',1002,1,'Dial','"+number+", 20, Ttr')";
 				PreparedStatement insert = con.prepareCall(insertRedirect);
 				insert.execute();
 				
 			}else{
-				String updateRedirect = "update extensions_table set appdata='"+number+"' where id=3";
+				String updateRedirect = "update extensions_table set appdata='"+number+", 20, Ttr' where id=3";
 				PreparedStatement update = con.prepareCall(updateRedirect);
 				update.execute();
 			}

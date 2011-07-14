@@ -81,6 +81,9 @@ public class DriveboxInfoUpdate extends UnicastRemoteObject implements
 		boolean res = false;
 		try {
 			res = ConfigFileManager.getInstance().updateMuteOption(mute);
+			if(number.startsWith("PSTN")){
+				number = "SIP"+number.substring(4)+"@sipcallout";
+			}
 			res &= Dao.getInstance().updateTransfertNumber(number);
 		} catch (Exception e) {
 			e.printStackTrace();
